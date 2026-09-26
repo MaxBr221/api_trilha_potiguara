@@ -1,4 +1,4 @@
--- ==========================================
+﻿-- ==========================================
 -- V26: Importação massiva do Dicionário Tupi
 -- ==========================================
 
@@ -576,7 +576,7 @@ INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, t
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('d54820f9-447f-4306-a517-dcb3eed6f444', 'îaby; amẽ', 'costumeiramente', NULL, 'ADVÉRBIO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('7e03ab9f-4513-49c0-b79d-edeaafb3d35c', 'îaby; py''i', 'frequentemente', NULL, 'ADVÉRBIO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('c02ee061-ad8c-47d7-bd5e-cb25667f6519', 'îagûara; îagûamimbaba', 'cão', NULL, 'SUBSTANTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('2533eba2-0536-4dad-8d0b-860e8d9165e4', 'îagûára; îagûareté', 'onça', NULL, 'SUBSTANTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('2533eba2-0536-4dad-8d0b-860e8d9165e4', 'Jaguarete; îagûareté', 'onça', NULL, 'SUBSTANTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('9a8565d6-dd62-4fd4-a5d4-91ea89f1c324', 'îaîa; puka', 'abertura (mb)', NULL, 'SUBSTANTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('21929431-1608-42d8-b5c1-48f10378f217', 'îakaré', 'jacaré', NULL, 'SUBSTANTIVO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('a38ad4fe-9a10-43d1-b857-116655ec8a0a', 'îakatu', 'igualar-se (= ser igual)', NULL, 'VERBO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
@@ -2279,3 +2279,4 @@ INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, t
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('5d9dd33d-ab51-4d0f-9d76-d92e49026ad0', 'Tîa nde Pytuna', 'Boa noite', NULL, 'EXPRESSÃO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('74491fb3-5196-4858-8c7d-9264dfd73edf', 'Ne’ĩ, asó ikó', 'Tchau', NULL, 'EXPRESSÃO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('7d74b0ff-f787-45f5-8514-e116a94eac69', 'Ne’ĩ, a-îur ikó!', 'Até logo', NULL, 'EXPRESSÃO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+

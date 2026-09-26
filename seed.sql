@@ -1,4 +1,4 @@
-
+﻿
 DELETE FROM usuario_conquistas;
 DELETE FROM conquistas;
 DELETE FROM exercicio_opcoes;
@@ -552,18 +552,18 @@ INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('16311aec-a23f-405b-b
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('16311aec-a23f-405b-b35e-026b688ce3a7', 'mondó');
 INSERT INTO modulos (id, titulo, descricao, ordem_index, trilha_id, criado_em, atualizado_em) VALUES ('cc549d95-f12c-4198-8296-b3bd9e278591', 'Módulo 3: Animais Comuns', 'Conheça os animais que habitam as florestas e rios.', 3, '22222222-2222-2222-2222-222222222223', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO licoes (id, titulo, descricao, ordem_index, modulo_id, criado_em, atualizado_em) VALUES ('a865c360-fd4b-4b5b-97bf-721910fe5893', 'Lição 1: Animais da Floresta', 'Onça, Anta, Macaco, Cobra.', 1, 'cc549d95-f12c-4198-8296-b3bd9e278591', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('e53045ea-d7b2-412d-887a-6ea226ae58fc', 'îagûára; îagûareté', 'onça', 'îagûára; îagûareté', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('e53045ea-d7b2-412d-887a-6ea226ae58fc', 'Jaguarete; îagûareté', 'onça', 'Jaguarete; îagûareté', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('a865c360-fd4b-4b5b-97bf-721910fe5893', 'e53045ea-d7b2-412d-887a-6ea226ae58fc');
-INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'a865c360-fd4b-4b5b-97bf-721910fe5893', 'O que significa a palavra "îagûára; îagûareté" em português?', 'MULTIPLA_ESCOLHA', 'onça', 10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'a865c360-fd4b-4b5b-97bf-721910fe5893', 'O que significa a palavra "Jaguarete; îagûareté" em português?', 'MULTIPLA_ESCOLHA', 'onça', 10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'onça');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'caranguejo (variedades)');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'quatro');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'muito (adv.)');
-INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) VALUES ('a44faedb-c620-486a-9e15-aff6b3cafeed', 'a865c360-fd4b-4b5b-97bf-721910fe5893', 'Como se diz "onça" em Tupi?', 'MULTIPLA_ESCOLHA', 'îagûára; îagûareté', 10, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) VALUES ('a44faedb-c620-486a-9e15-aff6b3cafeed', 'a865c360-fd4b-4b5b-97bf-721910fe5893', 'Como se diz "onça" em Tupi?', 'MULTIPLA_ESCOLHA', 'Jaguarete; îagûareté', 10, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('a44faedb-c620-486a-9e15-aff6b3cafeed', 'amanybã');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('a44faedb-c620-486a-9e15-aff6b3cafeed', 'agûeá');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('a44faedb-c620-486a-9e15-aff6b3cafeed', '''anga');
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('a44faedb-c620-486a-9e15-aff6b3cafeed', 'îagûára; îagûareté');
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('a44faedb-c620-486a-9e15-aff6b3cafeed', 'Jaguarete; îagûareté');
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('b92b994a-6283-4315-8f65-22c0d8d8eda9', 'tapi''ira', 'anta', 'tapi''ira', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('a865c360-fd4b-4b5b-97bf-721910fe5893', 'b92b994a-6283-4315-8f65-22c0d8d8eda9');
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) VALUES ('a548bd07-7100-4674-8672-a55cdf5c4d06', 'a865c360-fd4b-4b5b-97bf-721910fe5893', 'O que significa a palavra "tapi''ira" em português?', 'MULTIPLA_ESCOLHA', 'anta', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
@@ -835,4 +835,5 @@ INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c208fc0b-a6cc-4514-9
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c208fc0b-a6cc-4514-9384-101b431955d8', 'amõ');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c208fc0b-a6cc-4514-9384-101b431955d8', 'îub');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c208fc0b-a6cc-4514-9384-101b431955d8', 'py');
+
 
