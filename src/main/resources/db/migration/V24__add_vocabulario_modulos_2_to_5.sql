@@ -99,8 +99,8 @@ INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('16311aec-a23f-405b-b
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('16311aec-a23f-405b-b35e-026b688ce3a7', 'mondó');
 INSERT INTO modulos (id, titulo, descricao, ordem_index, trilha_id, criado_em, atualizado_em) VALUES ('cc549d95-f12c-4198-8296-b3bd9e278591', 'Módulo 3: Animais Comuns', 'Conheça os animais que habitam as florestas e rios.', 3, '22222222-2222-2222-2222-222222222223', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO licoes (id, titulo, descricao, ordem_index, modulo_id, criado_em, atualizado_em) VALUES ('a865c360-fd4b-4b5b-97bf-721910fe5893', 'Lição 1: Animais da Floresta', 'Onça, Anta, Macaco, Cobra.', 1, 'cc549d95-f12c-4198-8296-b3bd9e278591', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('e53045ea-d7b2-412d-887a-6ea226ae58fc', 'Jaguarete; îagûareté', 'onça', 'Jaguarete; îagûareté', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('a865c360-fd4b-4b5b-97bf-721910fe5893', 'e53045ea-d7b2-412d-887a-6ea226ae58fc');
+INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES ('55555555-5555-5555-5555-555555555553', 'Jaguarete; îagûareté', 'onça', 'Jaguarete; îagûareté', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('a865c360-fd4b-4b5b-97bf-721910fe5893', '55555555-5555-5555-5555-555555555553');
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'a865c360-fd4b-4b5b-97bf-721910fe5893', 'O que significa a palavra "Jaguarete; îagûareté" em português?', 'MULTIPLA_ESCOLHA', 'onça', 10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'onça');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('1a79d04d-e940-4924-a11a-cc437554cea2', 'caranguejo (variedades)');
@@ -382,5 +382,6 @@ INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c208fc0b-a6cc-4514-9
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c208fc0b-a6cc-4514-9384-101b431955d8', 'amõ');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c208fc0b-a6cc-4514-9384-101b431955d8', 'îub');
 INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c208fc0b-a6cc-4514-9384-101b431955d8', 'py');
+
 
 
