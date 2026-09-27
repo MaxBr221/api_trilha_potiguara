@@ -48,43 +48,43 @@ SELECT 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', id FROM conteudos_linguisticos WH
 -- 3. Inserir exercícios
 -- Ex 1 (PT -> Tupi): irmão
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) 
-VALUES ('11111111-1111-1111-1111-111111111111', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'Como se diz "irmão (de m.)" em Tupi?', 'MULTIPLA_ESCOLHA', 'kybyra', 10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('11111111-1111-1111-1111-111111111111', 'kybyra'), ('11111111-1111-1111-1111-111111111111', 'rendyra'), ('11111111-1111-1111-1111-111111111111', 'amõia'), ('11111111-1111-1111-1111-111111111111', 'aryîa');
+VALUES ('d8a7c2b1-5e9f-43d2-a1b4-7f8e9c0d1b2a', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'Como se diz "irmão (de m.)" em Tupi?', 'MULTIPLA_ESCOLHA', 'kybyra', 10, 1, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('d8a7c2b1-5e9f-43d2-a1b4-7f8e9c0d1b2a', 'kybyra'), ('d8a7c2b1-5e9f-43d2-a1b4-7f8e9c0d1b2a', 'rendyra'), ('d8a7c2b1-5e9f-43d2-a1b4-7f8e9c0d1b2a', 'amõia'), ('d8a7c2b1-5e9f-43d2-a1b4-7f8e9c0d1b2a', 'aryîa');
 
 -- Ex 2 (PT -> Tupi): irmã
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) 
-VALUES ('22222222-2222-2222-2222-222222222222', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'Como se diz "irmã" em Tupi?', 'MULTIPLA_ESCOLHA', 'rendyra', 10, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('22222222-2222-2222-2222-222222222222', 'kybyra'), ('22222222-2222-2222-2222-222222222222', 'rendyra'), ('22222222-2222-2222-2222-222222222222', 'amõia'), ('22222222-2222-2222-2222-222222222222', 'aryîa');
+VALUES ('f4b3e2c1-6a8d-4b9e-b2c5-8d9e0f1a2b3c', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'Como se diz "irmã" em Tupi?', 'MULTIPLA_ESCOLHA', 'rendyra', 10, 2, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('f4b3e2c1-6a8d-4b9e-b2c5-8d9e0f1a2b3c', 'kybyra'), ('f4b3e2c1-6a8d-4b9e-b2c5-8d9e0f1a2b3c', 'rendyra'), ('f4b3e2c1-6a8d-4b9e-b2c5-8d9e0f1a2b3c', 'amõia'), ('f4b3e2c1-6a8d-4b9e-b2c5-8d9e0f1a2b3c', 'aryîa');
 
 -- Ex 3 (PT -> Tupi): avô
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) 
-VALUES ('33333333-3333-3333-3333-333333333333', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'Como se diz "avô" em Tupi?', 'MULTIPLA_ESCOLHA', 'amõia', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('33333333-3333-3333-3333-333333333333', 'kybyra'), ('33333333-3333-3333-3333-333333333333', 'rendyra'), ('33333333-3333-3333-3333-333333333333', 'amõia'), ('33333333-3333-3333-3333-333333333333', 'aryîa');
+VALUES ('a1b2c3d4-e5f6-47a8-9b0c-1d2e3f4a5b6c', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'Como se diz "avô" em Tupi?', 'MULTIPLA_ESCOLHA', 'amõia', 10, 3, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('a1b2c3d4-e5f6-47a8-9b0c-1d2e3f4a5b6c', 'kybyra'), ('a1b2c3d4-e5f6-47a8-9b0c-1d2e3f4a5b6c', 'rendyra'), ('a1b2c3d4-e5f6-47a8-9b0c-1d2e3f4a5b6c', 'amõia'), ('a1b2c3d4-e5f6-47a8-9b0c-1d2e3f4a5b6c', 'aryîa');
 
 -- Ex 4 (PT -> Tupi): avó
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) 
-VALUES ('44444444-4444-4444-4444-444444444444', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'Como se diz "avó" em Tupi?', 'MULTIPLA_ESCOLHA', 'aryîa', 10, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('44444444-4444-4444-4444-444444444444', 'kybyra'), ('44444444-4444-4444-4444-444444444444', 'rendyra'), ('44444444-4444-4444-4444-444444444444', 'amõia'), ('44444444-4444-4444-4444-444444444444', 'aryîa');
+VALUES ('c3d4e5f6-a7b8-49c0-1d2e-3f4a5b6c7d8e', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'Como se diz "avó" em Tupi?', 'MULTIPLA_ESCOLHA', 'aryîa', 10, 4, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('c3d4e5f6-a7b8-49c0-1d2e-3f4a5b6c7d8e', 'kybyra'), ('c3d4e5f6-a7b8-49c0-1d2e-3f4a5b6c7d8e', 'rendyra'), ('c3d4e5f6-a7b8-49c0-1d2e-3f4a5b6c7d8e', 'amõia'), ('c3d4e5f6-a7b8-49c0-1d2e-3f4a5b6c7d8e', 'aryîa');
 
 -- Ex 5 (Tupi -> PT): irmão
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) 
-VALUES ('55555555-5555-5555-5555-555555555555', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'O que significa a palavra "kybyra" em português?', 'MULTIPLA_ESCOLHA', 'irmão (de m.)', 10, 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('55555555-5555-5555-5555-555555555555', 'irmão (de m.)'), ('55555555-5555-5555-5555-555555555555', 'irmã'), ('55555555-5555-5555-5555-555555555555', 'avô'), ('55555555-5555-5555-5555-555555555555', 'avó');
+VALUES ('e5f6a7b8-c9d0-41e2-f3a4-5b6c7d8e9f0a', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'O que significa a palavra "kybyra" em português?', 'MULTIPLA_ESCOLHA', 'irmão (de m.)', 10, 5, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('e5f6a7b8-c9d0-41e2-f3a4-5b6c7d8e9f0a', 'irmão (de m.)'), ('e5f6a7b8-c9d0-41e2-f3a4-5b6c7d8e9f0a', 'irmã'), ('e5f6a7b8-c9d0-41e2-f3a4-5b6c7d8e9f0a', 'avô'), ('e5f6a7b8-c9d0-41e2-f3a4-5b6c7d8e9f0a', 'avó');
 
 -- Ex 6 (Tupi -> PT): irmã
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) 
-VALUES ('66666666-6666-6666-6666-666666666666', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'O que significa a palavra "rendyra" em português?', 'MULTIPLA_ESCOLHA', 'irmã', 10, 6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('66666666-6666-6666-6666-666666666666', 'irmão (de m.)'), ('66666666-6666-6666-6666-666666666666', 'irmã'), ('66666666-6666-6666-6666-666666666666', 'avô'), ('66666666-6666-6666-6666-666666666666', 'avó');
+VALUES ('1a2b3c4d-5e6f-47a8-9b0c-d1e2f3a4b5c6', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'O que significa a palavra "rendyra" em português?', 'MULTIPLA_ESCOLHA', 'irmã', 10, 6, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('1a2b3c4d-5e6f-47a8-9b0c-d1e2f3a4b5c6', 'irmão (de m.)'), ('1a2b3c4d-5e6f-47a8-9b0c-d1e2f3a4b5c6', 'irmã'), ('1a2b3c4d-5e6f-47a8-9b0c-d1e2f3a4b5c6', 'avô'), ('1a2b3c4d-5e6f-47a8-9b0c-d1e2f3a4b5c6', 'avó');
 
 -- Ex 7 (Tupi -> PT): avô
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) 
-VALUES ('77777777-7777-7777-7777-777777777777', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'O que significa a palavra "amõia" em português?', 'MULTIPLA_ESCOLHA', 'avô', 10, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('77777777-7777-7777-7777-777777777777', 'irmão (de m.)'), ('77777777-7777-7777-7777-777777777777', 'irmã'), ('77777777-7777-7777-7777-777777777777', 'avô'), ('77777777-7777-7777-7777-777777777777', 'avó');
+VALUES ('2b3c4d5e-6f7a-48b9-c0d1-e2f3a4b5c6d7', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'O que significa a palavra "amõia" em português?', 'MULTIPLA_ESCOLHA', 'avô', 10, 7, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('2b3c4d5e-6f7a-48b9-c0d1-e2f3a4b5c6d7', 'irmão (de m.)'), ('2b3c4d5e-6f7a-48b9-c0d1-e2f3a4b5c6d7', 'irmã'), ('2b3c4d5e-6f7a-48b9-c0d1-e2f3a4b5c6d7', 'avô'), ('2b3c4d5e-6f7a-48b9-c0d1-e2f3a4b5c6d7', 'avó');
 
 -- Ex 8 (Tupi -> PT): avó
 INSERT INTO exercicios (id, licao_id, enunciado, tipo, resposta_correta, pontuacao_xp, ordem_index, criado_em, atualizado_em) 
-VALUES ('88888888-8888-8888-8888-888888888888', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'O que significa a palavra "aryîa" em português?', 'MULTIPLA_ESCOLHA', 'avó', 10, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('88888888-8888-8888-8888-888888888888', 'irmão (de m.)'), ('88888888-8888-8888-8888-888888888888', 'irmã'), ('88888888-8888-8888-8888-888888888888', 'avô'), ('88888888-8888-8888-8888-888888888888', 'avó');
+VALUES ('3c4d5e6f-7a8b-49c0-d1e2-f3a4b5c6d7e8', 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'O que significa a palavra "aryîa" em português?', 'MULTIPLA_ESCOLHA', 'avó', 10, 8, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO exercicio_opcoes (exercicio_id, opcao) VALUES ('3c4d5e6f-7a8b-49c0-d1e2-f3a4b5c6d7e8', 'irmão (de m.)'), ('3c4d5e6f-7a8b-49c0-d1e2-f3a4b5c6d7e8', 'irmã'), ('3c4d5e6f-7a8b-49c0-d1e2-f3a4b5c6d7e8', 'avô'), ('3c4d5e6f-7a8b-49c0-d1e2-f3a4b5c6d7e8', 'avó');
 
 -- 4. Misturar (embaralhar) TODOS os exercícios dos módulos >= 7
 -- A reclamação do usuário foi "palavra sy em portugues dps palavra mãe em tupi". 
