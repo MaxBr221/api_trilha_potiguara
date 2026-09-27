@@ -15,23 +15,35 @@ DELETE FROM licao_conteudo WHERE licao_id = 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb
 -- 2. Adicionar os conteúdos no banco
 -- Inserir kybyra (irmão)
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) 
-VALUES ('d15b2e7c-89fa-41bd-b6c8-54e7def690ac', 'kybyra', 'irmão (de homem)', 'kybyra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'd15b2e7c-89fa-41bd-b6c8-54e7def690ac');
+SELECT 'd15b2e7c-89fa-41bd-b6c8-54e7def690ac', 'kybyra', 'irmão (de homem)', 'kybyra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM conteudos_linguisticos WHERE lower(palavra_tupi) = 'kybyra');
+
+INSERT INTO licao_conteudo (licao_id, conteudo_id) 
+SELECT 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', id FROM conteudos_linguisticos WHERE lower(palavra_tupi) = 'kybyra' LIMIT 1;
 
 -- Inserir rendyra (irmã)
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) 
-VALUES ('c34a2e5f-14ab-45cd-a912-32a5bcd478fe', 'rendyra', 'irmã', 'rendyra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'c34a2e5f-14ab-45cd-a912-32a5bcd478fe');
+SELECT 'c34a2e5f-14ab-45cd-a912-32a5bcd478fe', 'rendyra', 'irmã', 'rendyra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM conteudos_linguisticos WHERE lower(palavra_tupi) = 'rendyra');
+
+INSERT INTO licao_conteudo (licao_id, conteudo_id) 
+SELECT 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', id FROM conteudos_linguisticos WHERE lower(palavra_tupi) = 'rendyra' LIMIT 1;
 
 -- Inserir amõia (avô)
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) 
-VALUES ('b47c9a2d-35bc-48de-b678-43d6cde589ac', 'amõia', 'avô', 'amõia', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'b47c9a2d-35bc-48de-b678-43d6cde589ac');
+SELECT 'b47c9a2d-35bc-48de-b678-43d6cde589ac', 'amõia', 'avô', 'amõia', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM conteudos_linguisticos WHERE lower(palavra_tupi) = 'amõia');
+
+INSERT INTO licao_conteudo (licao_id, conteudo_id) 
+SELECT 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', id FROM conteudos_linguisticos WHERE lower(palavra_tupi) = 'amõia' LIMIT 1;
 
 -- Inserir aryîa (avó)
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) 
-VALUES ('e81f5b4a-26cd-49ef-c789-54e7def690bd', 'aryîa', 'avó', 'aryîa', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
-INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'e81f5b4a-26cd-49ef-c789-54e7def690bd');
+SELECT 'e81f5b4a-26cd-49ef-c789-54e7def690bd', 'aryîa', 'avó', 'aryîa', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM conteudos_linguisticos WHERE lower(palavra_tupi) = 'aryîa');
+
+INSERT INTO licao_conteudo (licao_id, conteudo_id) 
+SELECT 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', id FROM conteudos_linguisticos WHERE lower(palavra_tupi) = 'aryîa' LIMIT 1;
 
 -- 3. Inserir exercícios
 -- Ex 1 (PT -> Tupi): irmão
