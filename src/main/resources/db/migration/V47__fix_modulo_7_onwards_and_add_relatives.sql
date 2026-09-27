@@ -13,8 +13,10 @@ DELETE FROM exercicios WHERE licao_id = 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2';
 DELETE FROM licao_conteudo WHERE licao_id = 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2';
 
 -- 2. Adicionar os conteúdos no banco
--- kybyra já existe no Módulo 7, mas vamos garantir e reassociar
-INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', '6e92d3c4-6d3c-4998-87ed-93c89150c9fe');
+-- Inserir kybyra (irmão)
+INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) 
+VALUES ('d15b2e7c-89fa-41bd-b6c8-54e7def690ac', 'kybyra', 'irmão (de homem)', 'kybyra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP);
+INSERT INTO licao_conteudo (licao_id, conteudo_id) VALUES ('bbbbc0e9-b190-4d86-94c5-d39282cd1fb2', 'd15b2e7c-89fa-41bd-b6c8-54e7def690ac');
 
 -- Inserir rendyra (irmã)
 INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) 
