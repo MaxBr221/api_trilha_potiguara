@@ -6,7 +6,7 @@
 DELETE FROM exercicio_opcoes WHERE exercicio_id IN (
     SELECT id FROM exercicios WHERE licao_id = 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2'
 );
-DELETE FROM exercicio_history WHERE exercicio_id IN (
+DELETE FROM progresso_usuario_exercicio WHERE exercicio_id IN (
     SELECT id FROM exercicios WHERE licao_id = 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2'
 );
 DELETE FROM exercicios WHERE licao_id = 'bbbbc0e9-b190-4d86-94c5-d39282cd1fb2';
