@@ -40,11 +40,10 @@ public class SecurityFilter extends OncePerRequestFilter {
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (Exception e) {
-                System.out.println("Invalid or expired JWT token: " + e.getMessage());
-                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                response.getWriter().write("{\"error\": \"Unauthorized\", \"message\": \"Token expired or invalid\"}");
-                response.setContentType("application/json");
-                return;
+                System.out.println("Invalid or expired JWT token, treating as anonymous: " + e.getMessage());
+                // IMPORTANTE: NÃO retornar 401 aqui! 
+                // Se a rota for pública, o visitante deve poder acessar mesmo com token expirado no cache.
+                // Apenas não autenticamos ele. O Spring Security se encarregará de bloquear depois caso a rota exija login.
             }
         }
         filterChain.doFilter(request, response);
