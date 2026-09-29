@@ -120,7 +120,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/esqueci-senha")
-    public ResponseEntity<Void> esqueciSenha(@RequestBody br.com.tupidigital.dto.EsqueciSenhaDTO data) {
+    public ResponseEntity<Void> esqueciSenha(@RequestBody @Valid br.com.tupidigital.dto.EsqueciSenhaDTO data) {
         Usuario usuario = (Usuario) repository.findByEmail(data.email());
         if (usuario != null) {
             String token = java.util.UUID.randomUUID().toString();
@@ -139,7 +139,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/redefinir-senha")
-    public ResponseEntity<Void> redefinirSenha(@RequestBody br.com.tupidigital.dto.RedefinirSenhaDTO data) {
+    public ResponseEntity<Void> redefinirSenha(@RequestBody @Valid br.com.tupidigital.dto.RedefinirSenhaDTO data) {
         java.util.Optional<br.com.tupidigital.entity.TokenRecuperacaoSenha> optionalToken = tokenRecuperacaoSenhaRepository.findByToken(data.token());
         
         if (optionalToken.isEmpty()) {

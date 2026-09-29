@@ -4,6 +4,7 @@ import br.com.tupidigital.dto.ExercicioResponseDTO;
 import br.com.tupidigital.dto.ValidacaoRespostaRequestDTO;
 import br.com.tupidigital.dto.ValidacaoRespostaResponseDTO;
 import br.com.tupidigital.service.ExercicioService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -26,7 +27,7 @@ public class ExercicioController {
     @PostMapping("/exercicios/{id}/validar")
     public ResponseEntity<ValidacaoRespostaResponseDTO> validarResposta(
             @PathVariable UUID id,
-            @RequestBody ValidacaoRespostaRequestDTO request) {
+            @RequestBody @Valid ValidacaoRespostaRequestDTO request) {
         return ResponseEntity.ok(exercicioService.validarResposta(id, request));
     }
 }

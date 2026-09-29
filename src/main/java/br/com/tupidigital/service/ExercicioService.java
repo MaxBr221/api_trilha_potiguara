@@ -37,7 +37,8 @@ public class ExercicioService {
         Exercicio exercicio = exercicioRepository.findById(exercicioId)
                 .orElseThrow(() -> new RuntimeException("Exercício não encontrado"));
 
-        String respostaUsuario = request.respostaUsuario() != null ? request.respostaUsuario().trim() : "";
+        // Sanitização básica contra tentativas de injeção de HTML/Scripts simples (embora Spring e JPA já evitem SQLi e XSS se bem configurados)
+        String respostaUsuario = request.respostaUsuario() != null ? request.respostaUsuario().replaceAll("<[^>]*>", "").trim() : "";
         String respostaCorreta = exercicio.getRespostaCorreta().trim();
 
         // Comparação simples (ignorando case)
@@ -55,8 +56,15 @@ public class ExercicioService {
                 Usuario usuario = (Usuario) userDetails;
 
                 if (correta) {
-                    usuario.setXp(usuario.getXp() + xpGanho);
-                    usuarioRepository.save(usuario);
+                    // Verifica se o usuário já acertou esse exercício antes para evitar falha de segurança (XP infinito)
+                    boolean jaAcertou = progressoUsuarioExercicioRepository.existsByUsuarioIdAndExercicioIdAndAcertouTrue(usuario.getId(), exercicio.getId());
+                    
+                    if (!jaAcertou) {
+                        usuario.setXp(usuario.getXp() + xpGanho);
+                        usuarioRepository.save(usuario);
+                    } else {
+                        xpGanho = 0; // Se já acertou, não ganha XP novamente
+                    }
                 }
 
                 // Salva o histórico de progresso do exercício

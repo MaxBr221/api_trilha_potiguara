@@ -11,4 +11,5 @@ import java.util.UUID;
 public interface ProgressoUsuarioExercicioRepository extends JpaRepository<ProgressoUsuarioExercicio, UUID> {
     long countByUsuarioId(UUID usuarioId);
     long countByUsuarioIdAndAcertouTrue(UUID usuarioId);
+    boolean existsByUsuarioIdAndExercicioIdAndAcertouTrue(UUID usuarioId, UUID exercicioId);
 }

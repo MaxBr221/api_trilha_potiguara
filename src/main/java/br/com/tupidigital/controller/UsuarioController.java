@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/v1/usuarios")
@@ -26,7 +27,7 @@ public class UsuarioController {
     }
 
     @org.springframework.web.bind.annotation.PutMapping("/me")
-    public ResponseEntity<Void> atualizarPerfil(@org.springframework.web.bind.annotation.RequestBody br.com.tupidigital.dto.UsuarioUpdateDTO data) {
+    public ResponseEntity<Void> atualizarPerfil(@org.springframework.web.bind.annotation.RequestBody @Valid br.com.tupidigital.dto.UsuarioUpdateDTO data) {
         usuarioService.atualizarPerfil(data);
         return ResponseEntity.ok().build();
     }
