@@ -46,6 +46,12 @@ public class AuthenticationController {
     @Autowired
     private br.com.tupidigital.service.EmailService emailService;
 
+    @Autowired
+    private br.com.tupidigital.repository.LicaoRepository licaoRepository;
+
+    @Autowired
+    private br.com.tupidigital.repository.ProgressoUsuarioLicaoRepository progressoUsuarioLicaoRepository;
+
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDTO> login(@RequestBody @Valid LoginRequestDTO data) {
         var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
@@ -92,10 +98,23 @@ public class AuthenticationController {
         newUsuario.setEmail(data.email());
         newUsuario.setSenha(encryptedPassword);
         newUsuario.setPerfil(perfil);
-        newUsuario.setXp(0);
-        newUsuario.setSequenciaAtual(0);
+        newUsuario.setXp(data.xpInicial() != null ? data.xpInicial() : 0);
+        newUsuario.setSequenciaAtual(data.licaoConcluidaId() != null ? 1 : 0);
+        if (data.licaoConcluidaId() != null) {
+            newUsuario.setUltimaAtividade(java.time.LocalDate.now(java.time.ZoneId.of("America/Sao_Paulo")));
+        }
 
         this.repository.save(newUsuario);
+
+        if (data.licaoConcluidaId() != null) {
+            java.util.Optional<br.com.tupidigital.entity.Licao> licao = licaoRepository.findById(data.licaoConcluidaId());
+            if (licao.isPresent()) {
+                br.com.tupidigital.entity.ProgressoUsuarioLicao progresso = new br.com.tupidigital.entity.ProgressoUsuarioLicao();
+                progresso.setUsuario(newUsuario);
+                progresso.setLicao(licao.get());
+                progressoUsuarioLicaoRepository.save(progresso);
+            }
+        }
 
         return ResponseEntity.ok().build();
     }
