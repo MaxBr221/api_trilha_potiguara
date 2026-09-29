@@ -46,6 +46,8 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.POST, "/api/v1/auth/redefinir-senha").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/trilhas/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/licoes/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/conteudos/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/dicionario/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/exercicios/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/error").permitAll()
