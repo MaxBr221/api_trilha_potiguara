@@ -2,28 +2,32 @@
 -- V51: Correção do Dicionário da Lição 1
 -- ==========================================
 
--- 1. Desvincular "Onça" (55555555-5555-5555-5555-555555555553) da Lição 1 (44444444-4444-4444-4444-444444444441)
--- Esse bug ocorreu no V23 devido a um copy-paste de UUID que conflitou com Onça inserida no V7.
+-- 1. Desvincular as palavras incorretas da Lição 1 (Tîa nde koema, Tîa nde Karuka, Onça)
 DELETE FROM licao_conteudo 
 WHERE licao_id = '44444444-4444-4444-4444-444444444441' 
-AND conteudo_id = '55555555-5555-5555-5555-555555555553';
+AND conteudo_id IN (
+    '55555555-5555-5555-5555-555555555551', -- Antigo Bom dia incorreto
+    '55555555-5555-5555-5555-555555555552', -- Antigo Boa tarde incorreto
+    '55555555-5555-5555-5555-555555555553'  -- Onça
+);
 
--- 2. Atualizar "Bom dia" para o valor correto
-UPDATE conteudos_linguisticos 
-SET palavra_tupi = 'Ko''ema', fonetica = 'Ko''ema', atualizado_em = CURRENT_TIMESTAMP
-WHERE id = '55555555-5555-5555-5555-555555555551';
+-- 2. Garantir que as palavras corretas EXISTEM na tabela de dicionário.
+-- Como pode haver restrições únicas, inserimos apenas se não existir.
+INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em)
+SELECT gen_random_uuid(), 'Ko''ema', 'Bom dia', 'Ko''ema', 'EXPRESSAO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM conteudos_linguisticos WHERE lower(palavra_tupi) = lower('Ko''ema'));
 
--- 3. Atualizar "Boa tarde" para o valor correto
-UPDATE conteudos_linguisticos 
-SET palavra_tupi = 'Kuarasy / Ka''aru', fonetica = 'Kuarasy / Ka''aru', atualizado_em = CURRENT_TIMESTAMP
-WHERE id = '55555555-5555-5555-5555-555555555552';
+INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em)
+SELECT gen_random_uuid(), 'Kuarasy / Ka''aru', 'Boa tarde', 'Kuarasy / Ka''aru', 'EXPRESSAO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM conteudos_linguisticos WHERE lower(palavra_tupi) = lower('Kuarasy / Ka''aru'));
 
--- 4. Inserir "Boa noite" corretamente (com um novo UUID livre de conflitos)
-INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) 
-VALUES ('55555555-5555-5555-5555-555555555556', 'Pituna porang / Pituna', 'Boa noite', 'Pituna porang / Pituna', 'EXPRESSAO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-ON CONFLICT (id) DO UPDATE SET palavra_tupi = EXCLUDED.palavra_tupi, fonetica = EXCLUDED.fonetica;
+INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em)
+SELECT gen_random_uuid(), 'Pituna porang / Pituna', 'Boa noite', 'Pituna porang / Pituna', 'EXPRESSAO', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP
+WHERE NOT EXISTS (SELECT 1 FROM conteudos_linguisticos WHERE lower(palavra_tupi) = lower('Pituna porang / Pituna'));
 
--- 5. Vincular a nova "Boa noite" à Lição 1
-INSERT INTO licao_conteudo (licao_id, conteudo_id) 
-VALUES ('44444444-4444-4444-4444-444444444441', '55555555-5555-5555-5555-555555555556')
+-- 3. Vincular essas três palavras corretas à Lição 1
+INSERT INTO licao_conteudo (licao_id, conteudo_id)
+SELECT '44444444-4444-4444-4444-444444444441', id
+FROM conteudos_linguisticos
+WHERE lower(palavra_tupi) IN (lower('Ko''ema'), lower('Kuarasy / Ka''aru'), lower('Pituna porang / Pituna'))
 ON CONFLICT DO NOTHING;
