@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import br.com.tupidigital.dto.response.ErrorResponseDTO;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -85,9 +86,9 @@ public class AuthenticationController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Void> register(@RequestBody @Valid RegisterRequestDTO data) {
+    public ResponseEntity<?> register(@RequestBody @Valid RegisterRequestDTO data) {
         if (this.repository.existsByEmail(data.email())) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Conflito", "Este e-mail já está em uso."));
         }
 
         String encryptedPassword = passwordEncoder.encode(data.senha());
@@ -120,7 +121,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/esqueci-senha")
-    public ResponseEntity<Void> esqueciSenha(@RequestBody @Valid br.com.tupidigital.dto.EsqueciSenhaDTO data) {
+    public ResponseEntity<?> esqueciSenha(@RequestBody @Valid br.com.tupidigital.dto.EsqueciSenhaDTO data) {
         Usuario usuario = (Usuario) repository.findByEmail(data.email());
         if (usuario != null) {
             String token = java.util.UUID.randomUUID().toString();
@@ -133,23 +134,25 @@ public class AuthenticationController {
             tokenRecuperacaoSenhaRepository.save(tokenEntity);
             
             emailService.enviarEmail(data.email(), "Recuperação de Senha - Tupi Digital", "Você solicitou a recuperação de senha.\n\nCopie o código a seguir e cole no aplicativo para redefinir sua senha:\n\n" + token);
+        } else {
+            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Não encontrado", "Usuário não encontrado."));
         }
         
         return ResponseEntity.ok().build();
     }
 
     @PostMapping("/redefinir-senha")
-    public ResponseEntity<Void> redefinirSenha(@RequestBody @Valid br.com.tupidigital.dto.RedefinirSenhaDTO data) {
+    public ResponseEntity<?> redefinirSenha(@RequestBody @Valid br.com.tupidigital.dto.RedefinirSenhaDTO data) {
         java.util.Optional<br.com.tupidigital.entity.TokenRecuperacaoSenha> optionalToken = tokenRecuperacaoSenhaRepository.findByToken(data.token());
         
         if (optionalToken.isEmpty()) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Token Inválido", "O código informado é inválido."));
         }
         
         br.com.tupidigital.entity.TokenRecuperacaoSenha tokenEntity = optionalToken.get();
         
         if (tokenEntity.getDataExpiracao().isBefore(java.time.LocalDateTime.now())) {
-            return ResponseEntity.badRequest().build();
+            return ResponseEntity.badRequest().body(new ErrorResponseDTO("Token Expirado", "O código informado já expirou."));
         }
         
         Usuario usuario = tokenEntity.getUsuario();
