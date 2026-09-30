@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 
 public record LoginRequestDTO(
-        @NotBlank @Pattern(regexp = "^.+@.+\\..+$", message = "Email está num formato inválido") String email,
+        @NotBlank String email,
         @NotBlank String senha
 ) {
 }
