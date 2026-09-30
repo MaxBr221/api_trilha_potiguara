@@ -70,4 +70,10 @@ public class UsuarioController {
         usuarioService.marcarNotificacaoLida(id);
         return ResponseEntity.ok().build();
     }
+
+    @org.springframework.web.bind.annotation.DeleteMapping("/notificacoes/{id}")
+    public ResponseEntity<Void> removerNotificacao(@org.springframework.web.bind.annotation.PathVariable java.util.UUID id) {
+        usuarioService.removerNotificacao(id);
+        return ResponseEntity.ok().build();
+    }
 }

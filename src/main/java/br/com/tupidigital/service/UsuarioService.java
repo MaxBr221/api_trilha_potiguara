@@ -305,4 +305,22 @@ public class UsuarioService {
         notificacao.setLida(true);
         notificacaoRepository.save(notificacao);
     }
+
+    public void removerNotificacao(java.util.UUID notificacaoId) {
+        String email = SecurityContextHolder.getContext().getAuthentication().getName();
+        Usuario usuario = (Usuario) usuarioRepository.findByEmail(email);
+        
+        if (usuario == null) {
+            throw new RuntimeException("Usuário não encontrado");
+        }
+        
+        br.com.tupidigital.entity.Notificacao notificacao = notificacaoRepository.findById(notificacaoId)
+                .orElseThrow(() -> new RuntimeException("Notificação não encontrada"));
+                
+        if (!notificacao.getUsuario().getId().equals(usuario.getId())) {
+            throw new RuntimeException("Acesso negado");
+        }
+        
+        notificacaoRepository.delete(notificacao);
+    }
 }
