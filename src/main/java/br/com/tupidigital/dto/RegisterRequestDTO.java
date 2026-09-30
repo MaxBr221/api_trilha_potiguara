@@ -10,7 +10,7 @@ public record RegisterRequestDTO(
         @NotBlank @Size(min = 3, max = 255) 
         @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\s]*$", message = "O nome deve conter apenas letras e espaços")
         String nome,
-        @NotBlank @Email String email,
+        @NotBlank @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$", message = "must be a well-formed email address") String email,
         @NotBlank @Size(min = 6) String senha,
         Perfil perfil, // optional, if null default to USER
         Integer xpInicial, // optional, for lazy registration

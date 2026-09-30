@@ -24,6 +24,8 @@ public class GlobalExceptionHandler {
             errors.put(fieldName, errorMessage);
         });
         
+        System.out.println("⚠️ Erros de Validação no Cadastro: " + errors);
+        
         ErrorResponseDTO errorResponse = new ErrorResponseDTO(
                 "Erro de Validação", 
                 "Alguns campos são inválidos. Verifique os dados enviados.", 
