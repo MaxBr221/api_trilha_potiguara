@@ -117,7 +117,19 @@ public class AuthenticationController {
             }
         }
 
-        return ResponseEntity.ok().build();
+        var token = tokenService.generateToken(newUsuario);
+
+        TokenResponseDTO.UsuarioSessaoDTO sessaoDTO = new TokenResponseDTO.UsuarioSessaoDTO(
+                newUsuario.getId(),
+                newUsuario.getNome(),
+                newUsuario.getEmail(),
+                newUsuario.getXp(),
+                newUsuario.getSequenciaAtual(),
+                newUsuario.getPerfil().name(),
+                newUsuario.getFotoPerfil()
+        );
+
+        return ResponseEntity.ok(new TokenResponseDTO(token, sessaoDTO));
     }
 
     @PostMapping("/esqueci-senha")
