@@ -55,7 +55,8 @@ public class AuthenticationController {
 
     @PostMapping("/login")
     public ResponseEntity<TokenResponseDTO> login(@RequestBody @Valid LoginRequestDTO data) {
-        var usernamePassword = new UsernamePasswordAuthenticationToken(data.email(), data.senha());
+        String email = org.springframework.web.util.HtmlUtils.htmlUnescape(data.email());
+        var usernamePassword = new UsernamePasswordAuthenticationToken(email, data.senha());
         var auth = this.authenticationManager.authenticate(usernamePassword);
 
         Usuario authUser = (Usuario) auth.getPrincipal();
@@ -87,7 +88,8 @@ public class AuthenticationController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@RequestBody @Valid RegisterRequestDTO data) {
-        if (this.repository.existsByEmail(data.email())) {
+        String email = org.springframework.web.util.HtmlUtils.htmlUnescape(data.email());
+        if (this.repository.existsByEmail(email)) {
             return ResponseEntity.badRequest().body(new ErrorResponseDTO("Conflito", "Este e-mail já está em uso."));
         }
 
@@ -96,7 +98,7 @@ public class AuthenticationController {
 
         Usuario newUsuario = new Usuario();
         newUsuario.setNome(data.nome());
-        newUsuario.setEmail(data.email());
+        newUsuario.setEmail(email);
         newUsuario.setSenha(encryptedPassword);
         newUsuario.setPerfil(perfil);
         newUsuario.setXp(data.xpInicial() != null ? data.xpInicial() : 0);
@@ -134,7 +136,8 @@ public class AuthenticationController {
 
     @PostMapping("/esqueci-senha")
     public ResponseEntity<?> esqueciSenha(@RequestBody @Valid br.com.tupidigital.dto.EsqueciSenhaDTO data) {
-        Usuario usuario = (Usuario) repository.findByEmail(data.email());
+        String email = org.springframework.web.util.HtmlUtils.htmlUnescape(data.email());
+        Usuario usuario = (Usuario) repository.findByEmail(email);
         if (usuario != null) {
             String token = java.util.UUID.randomUUID().toString();
             
@@ -145,7 +148,7 @@ public class AuthenticationController {
             
             tokenRecuperacaoSenhaRepository.save(tokenEntity);
             
-            emailService.enviarEmail(data.email(), "Recuperação de Senha - Tupi Digital", "Você solicitou a recuperação de senha.\n\nCopie o código a seguir e cole no aplicativo para redefinir sua senha:\n\n" + token);
+            emailService.enviarEmail(email, "Recuperação de Senha - Tupi Digital", "Você solicitou a recuperação de senha.\n\nCopie o código a seguir e cole no aplicativo para redefinir sua senha:\n\n" + token);
         } else {
             return ResponseEntity.badRequest().body(new ErrorResponseDTO("Não encontrado", "Usuário não encontrado."));
         }
