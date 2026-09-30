@@ -21,8 +21,10 @@ import br.com.tupidigital.entity.Licao;
 import br.com.tupidigital.entity.ProgressoUsuarioLicao;
 import java.util.ArrayList;
 import java.time.LocalDate;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class TrilhaService {
 
     @Autowired

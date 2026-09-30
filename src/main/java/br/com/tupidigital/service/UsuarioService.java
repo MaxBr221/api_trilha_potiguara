@@ -17,8 +17,10 @@ import br.com.tupidigital.repository.UsuarioConquistaRepository;
 import br.com.tupidigital.repository.ProgressoUsuarioExercicioRepository;
 import br.com.tupidigital.dto.DashboardConquistaDTO;
 import br.com.tupidigital.entity.UsuarioConquista;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional
 public class UsuarioService {
 
     @Autowired

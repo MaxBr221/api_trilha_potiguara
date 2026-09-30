@@ -15,6 +15,6 @@ public interface UsuarioRepository extends JpaRepository<Usuario, UUID> {
     java.util.List<Usuario> findTop20ByIdNotOrderByXpDesc(UUID id);
 
     @org.springframework.data.jpa.repository.Query("SELECT u FROM Usuario u WHERE u.id != :id AND (LOWER(u.nome) LIKE LOWER(CONCAT('%', :termo, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :termo, '%')))")
-    java.util.List<Usuario> buscarPorNomeOuEmail(String termo, UUID id, org.springframework.data.domain.Pageable pageable);
+    java.util.List<Usuario> buscarPorNomeOuEmail(@org.springframework.data.repository.query.Param("termo") String termo, @org.springframework.data.repository.query.Param("id") UUID id, org.springframework.data.domain.Pageable pageable);
 
 }
