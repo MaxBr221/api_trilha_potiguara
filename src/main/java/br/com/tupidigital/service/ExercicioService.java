@@ -42,10 +42,15 @@ public class ExercicioService {
 
         // Sanitização básica contra tentativas de injeção de HTML/Scripts simples (embora Spring e JPA já evitem SQLi e XSS se bem configurados)
         String respostaUsuario = request.respostaUsuario() != null ? request.respostaUsuario().replaceAll("<[^>]*>", "").trim() : "";
+        respostaUsuario = HtmlUtils.htmlUnescape(respostaUsuario);
         String respostaCorreta = exercicio.getRespostaCorreta().trim();
 
+        // Normalizar strings para evitar falhas por aspas simples HTML (&#39;) ou aspas tipográficas
+        String rUserNorm = respostaUsuario.replace("'", "").replace("’", "").replace("&#39;", "").replace("&apos;", "");
+        String rCorrNorm = respostaCorreta.replace("'", "").replace("’", "").replace("&#39;", "").replace("&apos;", "");
+        
         // Comparação simples (ignorando case)
-        boolean correta = respostaUsuario.equalsIgnoreCase(respostaCorreta);
+        boolean correta = rUserNorm.equalsIgnoreCase(rCorrNorm) || respostaUsuario.equalsIgnoreCase(respostaCorreta);
 
         Integer xpGanho = correta ? exercicio.getPontuacaoXp() : 0;
 
