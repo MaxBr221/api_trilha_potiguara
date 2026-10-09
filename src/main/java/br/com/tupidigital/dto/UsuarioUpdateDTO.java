@@ -10,5 +10,7 @@ public record UsuarioUpdateDTO(
         String nome,
         
         @Size(max = 5242880, message = "A foto de perfil é muito grande (máximo 5MB)")
+        @Pattern(regexp = "^$|^data:image/(jpeg|png|webp);base64,[A-Za-z0-9+/=]+$",
+                message = "A foto de perfil deve ser uma imagem Base64 válida (jpeg, png ou webp)")
         String fotoPerfil
 ) {}
