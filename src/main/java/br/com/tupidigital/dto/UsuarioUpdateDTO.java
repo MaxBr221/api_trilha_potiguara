@@ -9,6 +9,6 @@ public record UsuarioUpdateDTO(
         @Pattern(regexp = "^[a-zA-ZÀ-ÿ\\s]*$", message = "O nome deve conter apenas letras e espaços")
         String nome,
         
-        @Size(max = 1048576, message = "A foto de perfil é muito grande (máximo 1MB)")
+        @Size(max = 5242880, message = "A foto de perfil é muito grande (máximo 5MB)")
         String fotoPerfil
 ) {}
