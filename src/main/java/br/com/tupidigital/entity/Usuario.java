@@ -42,7 +42,7 @@ public class Usuario implements UserDetails {
     @Column(name = "sequencia_atual", nullable = false)
     private Integer sequenciaAtual = 0;
 
-    @Column(name = "foto_perfil", columnDefinition = "TEXT")
+    @Column(name = "foto_perfil", columnDefinition = "MEDIUMTEXT")
     private String fotoPerfil;
 
     @Column(name = "ultima_atividade")
