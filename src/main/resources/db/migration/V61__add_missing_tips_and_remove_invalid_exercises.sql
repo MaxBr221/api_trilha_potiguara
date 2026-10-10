@@ -3,52 +3,57 @@
 -- ==========================================
 
 -- 1. Inserir palavras faltantes no dicionário (conteudos_linguisticos) se não existirem
-INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em) VALUES
-('b0000000-0000-0000-0000-000000000001', 'Oîepé', 'Um', 'Oîepé', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000002', 'Mokõi', 'Dois', 'Mokõi', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000003', 'Mosapyr', 'Três', 'Mosapyr', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000004', 'Irundy', 'Quatro', 'Irundy', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000005', 'Ambo', 'Cinco', 'Ambo', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+-- Utilizamos WHERE NOT EXISTS para evitar violação do índice unique idx_conteudos_linguisticos_palavra_tupi_lower
+INSERT INTO conteudos_linguisticos (id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em)
+SELECT * FROM (VALUES
+  ('b0000000-0000-0000-0000-000000000001'::uuid, 'Oîepé', 'Um', 'Oîepé', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000002'::uuid, 'Mokõi', 'Dois', 'Mokõi', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000003'::uuid, 'Mosapyr', 'Três', 'Mosapyr', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000004'::uuid, 'Irundy', 'Quatro', 'Irundy', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000005'::uuid, 'Ambo', 'Cinco', 'Ambo', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
-('b0000000-0000-0000-0000-000000000006', 'Pytã', 'Vermelho', 'Pytã', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000007', 'Tinga', 'Branco', 'Tinga', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000008', 'Un', 'Preto', 'Un', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000009', 'Yuba', 'Amarelo', 'Yuba', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000010', 'Oby', 'Verde', 'Oby', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000006'::uuid, 'Pytã', 'Vermelho', 'Pytã', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000007'::uuid, 'Tinga', 'Branco', 'Tinga', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000008'::uuid, 'Un', 'Preto', 'Un', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000009'::uuid, 'Yuba', 'Amarelo', 'Yuba', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000010'::uuid, 'Oby', 'Verde', 'Oby', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
-('b0000000-0000-0000-0000-000000000011', 'Ta''yra', 'Filho', 'Ta''yra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000012', 'Taîyra', 'Filha', 'Taîyra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000011'::uuid, 'Ta''yra', 'Filho', 'Ta''yra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000012'::uuid, 'Taîyra', 'Filha', 'Taîyra', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
 
-('b0000000-0000-0000-0000-000000000013', 'Ybyrá', 'Árvore', 'Ybyrá', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000014', 'Mandi''oka', 'Mandioca', 'Mandi''oka', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000015', 'Abati', 'Milho', 'Abati', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
-('b0000000-0000-0000-0000-000000000016', 'Pakoba', 'Banana', 'Pakoba', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
-ON CONFLICT (id) DO NOTHING;
+  ('b0000000-0000-0000-0000-000000000013'::uuid, 'Ybyrá', 'Árvore', 'Ybyrá', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000014'::uuid, 'Mandi''oka', 'Mandioca', 'Mandi''oka', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000015'::uuid, 'Abati', 'Milho', 'Abati', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP),
+  ('b0000000-0000-0000-0000-000000000016'::uuid, 'Pakoba', 'Banana', 'Pakoba', 'PALAVRA', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+) AS v(id, palavra_tupi, traducao_ptbr, fonetica, tipo, criado_em, atualizado_em)
+WHERE NOT EXISTS (
+  SELECT 1 FROM conteudos_linguisticos cl WHERE LOWER(cl.palavra_tupi) = LOWER(v.palavra_tupi)
+);
 
 -- 2. Vincular as palavras às Lições
 
 -- Lição: M2 Números L1 (44444444-4444-4444-4444-444444444443)
 INSERT INTO licao_conteudo (licao_id, conteudo_id)
 SELECT '44444444-4444-4444-4444-444444444443', id FROM conteudos_linguisticos 
-WHERE palavra_tupi IN ('Oîepé', 'Mokõi', 'Mosapyr', 'Irundy', 'Ambo')
+WHERE LOWER(palavra_tupi) IN (LOWER('Oîepé'), LOWER('Mokõi'), LOWER('Mosapyr'), LOWER('Irundy'), LOWER('Ambo'))
 ON CONFLICT DO NOTHING;
 
 -- Lição: M3 Cores L1 (b3e8ab21-8eb1-4d14-8f2d-8e470125e130)
 INSERT INTO licao_conteudo (licao_id, conteudo_id)
 SELECT 'b3e8ab21-8eb1-4d14-8f2d-8e470125e130', id FROM conteudos_linguisticos 
-WHERE palavra_tupi IN ('Pytã', 'Tinga', 'Un', 'Yuba', 'Oby')
+WHERE LOWER(palavra_tupi) IN (LOWER('Pytã'), LOWER('Tinga'), LOWER('Un'), LOWER('Yuba'), LOWER('Oby'))
 ON CONFLICT DO NOTHING;
 
 -- Lição: M4 Família L1 (d7b4e9f9-e3b9-4a0b-93cd-5d63f0d5a3ef)
 INSERT INTO licao_conteudo (licao_id, conteudo_id)
 SELECT 'd7b4e9f9-e3b9-4a0b-93cd-5d63f0d5a3ef', id FROM conteudos_linguisticos 
-WHERE palavra_tupi IN ('Ta''yra', 'Taîyra')
+WHERE LOWER(palavra_tupi) IN (LOWER('Ta''yra'), LOWER('Taîyra'))
 ON CONFLICT DO NOTHING;
 
 -- Lição: M1 Natureza L2 (44444444-4444-4444-4444-444444444445)
 INSERT INTO licao_conteudo (licao_id, conteudo_id)
 SELECT '44444444-4444-4444-4444-444444444445', id FROM conteudos_linguisticos 
-WHERE palavra_tupi IN ('Ybyrá', 'Mandi''oka', 'Abati', 'Pakoba')
+WHERE LOWER(palavra_tupi) IN (LOWER('Ybyrá'), LOWER('Mandi''oka'), LOWER('Abati'), LOWER('Pakoba'))
 ON CONFLICT DO NOTHING;
 
 -- 3. Remover exercícios com palavras inválidas ("kunumĩ", "kunha'taĩ", "cunhã", "kunumĩ mirĩ")
