@@ -1,5 +1,6 @@
 package br.com.tupidigital.service;
 
+import br.com.tupidigital.dto.DicaExercicioResponseDTO;
 import br.com.tupidigital.dto.ExercicioResponseDTO;
 import br.com.tupidigital.dto.ValidacaoRespostaRequestDTO;
 import br.com.tupidigital.dto.ValidacaoRespostaResponseDTO;
@@ -30,6 +31,9 @@ public class ExercicioService {
     @Autowired
     private ProgressoUsuarioExercicioRepository progressoUsuarioExercicioRepository;
 
+    @Autowired
+    private GeminiService geminiService;
+
     public List<ExercicioResponseDTO> listarExerciciosPorLicao(UUID licaoId) {
         return exercicioRepository.findByLicaoIdOrderByOrdemIndexAsc(licaoId).stream()
                 .map(ExercicioResponseDTO::new)
@@ -51,6 +55,14 @@ public class ExercicioService {
         
         // Comparação simples (ignorando case)
         boolean correta = rUserNorm.equalsIgnoreCase(rCorrNorm) || respostaUsuario.equalsIgnoreCase(respostaCorreta);
+        String feedback = correta ? "Parabéns! Resposta correta!" : null;
+
+        // Se errou e for exercício de digitação/tradução, ativa avaliação pedagógica com IA (2.2)
+        if (!correta && ("DIGITACAO".equalsIgnoreCase(exercicio.getTipo()) || "TRADUCAO".equalsIgnoreCase(exercicio.getTipo()))) {
+            var avaliacaoIA = geminiService.avaliarTentativa(exercicio.getEnunciado(), respostaCorreta, respostaUsuario);
+            correta = avaliacaoIA.aceita();
+            feedback = avaliacaoIA.feedbackPedagogico();
+        }
 
         Integer xpGanho = correta ? exercicio.getPontuacaoXp() : 0;
 
@@ -86,6 +98,19 @@ public class ExercicioService {
             }
         }
         
-        return new ValidacaoRespostaResponseDTO(correta, xpGanho, exercicio.getRespostaCorreta());
+        return new ValidacaoRespostaResponseDTO(correta, xpGanho, exercicio.getRespostaCorreta(), feedback);
+    }
+
+    public DicaExercicioResponseDTO obterDica(UUID exercicioId) {
+        Exercicio exercicio = exercicioRepository.findById(exercicioId)
+                .orElseThrow(() -> new RuntimeException("Exercício não encontrado"));
+
+        String dica = geminiService.gerarDica(
+                exercicio.getEnunciado(),
+                exercicio.getRespostaCorreta(),
+                exercicio.getOpcoes()
+        );
+
+        return new DicaExercicioResponseDTO(dica);
     }
 }

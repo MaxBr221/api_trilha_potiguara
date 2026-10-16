@@ -1,5 +1,6 @@
 package br.com.tupidigital.controller;
 
+import br.com.tupidigital.dto.DicaExercicioResponseDTO;
 import br.com.tupidigital.dto.ExercicioResponseDTO;
 import br.com.tupidigital.dto.ValidacaoRespostaRequestDTO;
 import br.com.tupidigital.dto.ValidacaoRespostaResponseDTO;
@@ -29,5 +30,10 @@ public class ExercicioController {
             @PathVariable UUID id,
             @RequestBody @Valid ValidacaoRespostaRequestDTO request) {
         return ResponseEntity.ok(exercicioService.validarResposta(id, request));
+    }
+
+    @GetMapping("/exercicios/{id}/dica")
+    public ResponseEntity<DicaExercicioResponseDTO> obterDica(@PathVariable UUID id) {
+        return ResponseEntity.ok(exercicioService.obterDica(id));
     }
 }
