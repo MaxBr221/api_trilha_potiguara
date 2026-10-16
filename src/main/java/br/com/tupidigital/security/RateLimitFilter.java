@@ -22,10 +22,10 @@ public class RateLimitFilter extends OncePerRequestFilter {
     private final Map<String, Bucket> cache = new ConcurrentHashMap<>();
 
     private Bucket createNewBucket() {
-        // Limit: 100 requests per 1 minute per IP
+        // Limite ampliado para 800 requisições por minuto por IP (permite que múltiplos usuários no mesmo Wi-Fi usem o sistema sem bloqueio)
         Bandwidth limit = Bandwidth.builder()
-                .capacity(100)
-                .refillGreedy(100, Duration.ofMinutes(1))
+                .capacity(800)
+                .refillGreedy(800, Duration.ofMinutes(1))
                 .build();
         return Bucket.builder()
                 .addLimit(limit)

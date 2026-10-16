@@ -15,8 +15,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.annotation.Propagation;
 
 @Service
 @Transactional
@@ -33,6 +36,9 @@ public class ExercicioService {
 
     @Autowired
     private GeminiService geminiService;
+
+    // Cache em memória: garante respostas em 0ms para a apresentação e blinda a cota do Gemini
+    private final Map<UUID, String> cacheDicas = new ConcurrentHashMap<>();
 
     public List<ExercicioResponseDTO> listarExerciciosPorLicao(UUID licaoId) {
         return exercicioRepository.findByLicaoIdOrderByOrdemIndexAsc(licaoId).stream()
@@ -101,15 +107,29 @@ public class ExercicioService {
         return new ValidacaoRespostaResponseDTO(correta, xpGanho, exercicio.getRespostaCorreta(), feedback);
     }
 
+    @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
     public DicaExercicioResponseDTO obterDica(UUID exercicioId) {
+        // 1. Retorno instantâneo do cache em memória (0ms, zero chamadas ao banco e zero consumo de cota)
+        String dicaCacheada = cacheDicas.get(exercicioId);
+        if (dicaCacheada != null) {
+            return new DicaExercicioResponseDTO(dicaCacheada);
+        }
+
+        // 2. Busca rápida dos dados do exercício
         Exercicio exercicio = exercicioRepository.findById(exercicioId)
                 .orElseThrow(() -> new RuntimeException("Exercício não encontrado"));
 
-        String dica = geminiService.gerarDica(
-                exercicio.getEnunciado(),
-                exercicio.getRespostaCorreta(),
-                exercicio.getOpcoes()
-        );
+        String enunciado = exercicio.getEnunciado();
+        String respostaCorreta = exercicio.getRespostaCorreta();
+        List<String> opcoes = exercicio.getOpcoes() != null ? List.copyOf(exercicio.getOpcoes()) : List.of();
+
+        // 3. Gera a dica via IA
+        String dica = geminiService.gerarDica(enunciado, respostaCorreta, opcoes);
+
+        // 4. Salva no cache para que todos os outros alunos recebam instantaneamente
+        if (dica != null && !dica.isBlank()) {
+            cacheDicas.put(exercicioId, dica);
+        }
 
         return new DicaExercicioResponseDTO(dica);
     }
