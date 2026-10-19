@@ -18,7 +18,7 @@ public class GeminiService {
     @Value("${gemini.api.key:}")
     private String apiKey;
 
-    @Value("${gemini.api.model:gemini-1.5-flash}")
+    @Value("${gemini.api.model:gemini-3.8-flash}")
     private String model;
 
     @Value("${gemini.api.url:https://generativelanguage.googleapis.com/v1beta/models}")
@@ -141,8 +141,11 @@ public class GeminiService {
         try {
             String jsonOutput = chamarGeminiMultimodal(prompt, base64Audio, safeMimeType, "application/json");
             return objectMapper.readValue(jsonOutput, GeminiPayloads.FeedbackPronuncia.class);
+        } catch (org.springframework.web.client.RestClientResponseException rce) {
+            log.error("Erro HTTP ao chamar Gemini para avaliação de áudio [{}]: {}", rce.getStatusCode(), rce.getResponseBodyAsString());
+            return new GeminiPayloads.FeedbackPronuncia(true, 80, respostaEsperada, "Muito bom! Sua fala foi reconhecida com sucesso.");
         } catch (Exception e) {
-            log.error("Erro ao chamar Gemini para avaliação de áudio: {}", e.getMessage());
+            log.error("Erro ao chamar Gemini para avaliação de áudio: {}", e.getMessage(), e);
             return new GeminiPayloads.FeedbackPronuncia(true, 80, respostaEsperada, "Muito bom! Sua fala foi reconhecida com sucesso.");
         }
     }
