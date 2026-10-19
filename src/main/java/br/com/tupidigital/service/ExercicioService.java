@@ -2,6 +2,7 @@ package br.com.tupidigital.service;
 
 import br.com.tupidigital.dto.DicaExercicioResponseDTO;
 import br.com.tupidigital.dto.ExercicioResponseDTO;
+import br.com.tupidigital.dto.ValidacaoAudioResponseDTO;
 import br.com.tupidigital.dto.ValidacaoRespostaRequestDTO;
 import br.com.tupidigital.dto.ValidacaoRespostaResponseDTO;
 import br.com.tupidigital.entity.Exercicio;
@@ -63,8 +64,8 @@ public class ExercicioService {
         boolean correta = rUserNorm.equalsIgnoreCase(rCorrNorm) || respostaUsuario.equalsIgnoreCase(respostaCorreta);
         String feedback = correta ? "Parabéns! Resposta correta!" : null;
 
-        // Se errou e for exercício de digitação/tradução, ativa avaliação pedagógica com IA (2.2)
-        if (!correta && ("DIGITACAO".equalsIgnoreCase(exercicio.getTipo()) || "TRADUCAO".equalsIgnoreCase(exercicio.getTipo()))) {
+        // Se errou e for exercício de digitação/tradução/pronúncia, ativa avaliação pedagógica com IA (2.2)
+        if (!correta && ("DIGITACAO".equalsIgnoreCase(exercicio.getTipo()) || "TRADUCAO".equalsIgnoreCase(exercicio.getTipo()) || "PRONUNCIA".equalsIgnoreCase(exercicio.getTipo()))) {
             var avaliacaoIA = geminiService.avaliarTentativa(exercicio.getEnunciado(), respostaCorreta, respostaUsuario);
             correta = avaliacaoIA.aceita();
             feedback = avaliacaoIA.feedbackPedagogico();
@@ -105,6 +106,52 @@ public class ExercicioService {
         }
         
         return new ValidacaoRespostaResponseDTO(correta, xpGanho, exercicio.getRespostaCorreta(), feedback);
+    }
+
+    public ValidacaoAudioResponseDTO validarAudio(UUID exercicioId, byte[] audioBytes, String mimeType) {
+        Exercicio exercicio = exercicioRepository.findById(exercicioId)
+                .orElseThrow(() -> new RuntimeException("Exercício não encontrado"));
+
+        String respostaCorreta = exercicio.getRespostaCorreta().trim();
+        var avaliacaoIA = geminiService.avaliarPronuncia(audioBytes, mimeType, exercicio.getEnunciado(), respostaCorreta);
+
+        boolean correta = avaliacaoIA.aceita() || (avaliacaoIA.precisao() != null && avaliacaoIA.precisao() >= 60);
+        int precisao = avaliacaoIA.precisao() != null ? avaliacaoIA.precisao() : (correta ? 80 : 45);
+        String feedback = avaliacaoIA.feedbackPedagogico();
+        String transcricao = avaliacaoIA.transcricaoAproximada();
+
+        Integer xpGanho = correta ? exercicio.getPontuacaoXp() : 0;
+
+        org.springframework.security.core.Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        
+        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
+            String email = auth.getName();
+            org.springframework.security.core.userdetails.UserDetails userDetails = usuarioRepository.findByEmail(email);
+            
+            if (userDetails != null) {
+                Usuario usuario = (Usuario) userDetails;
+
+                if (correta) {
+                    boolean jaAcertou = progressoUsuarioExercicioRepository.existsByUsuarioIdAndExercicioIdAndAcertouTrue(usuario.getId(), exercicio.getId());
+                    if (!jaAcertou) {
+                        usuario.setXp(usuario.getXp() + xpGanho);
+                        usuarioRepository.save(usuario);
+                    } else {
+                        xpGanho = 0;
+                    }
+                }
+
+                br.com.tupidigital.entity.ProgressoUsuarioExercicio progressoExercicio = new br.com.tupidigital.entity.ProgressoUsuarioExercicio();
+                progressoExercicio.setUsuario(usuario);
+                progressoExercicio.setExercicio(exercicio);
+                progressoExercicio.setAcertou(correta);
+                progressoExercicio.setCriadoEm(java.time.LocalDateTime.now());
+                
+                progressoUsuarioExercicioRepository.save(progressoExercicio);
+            }
+        }
+
+        return new ValidacaoAudioResponseDTO(correta, precisao, xpGanho, respostaCorreta, transcricao, feedback);
     }
 
     @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)

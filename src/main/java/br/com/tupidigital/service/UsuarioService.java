@@ -154,7 +154,8 @@ public class UsuarioService {
                 usuario.getXp(),
                 usuario.getSequenciaAtual(),
                 usuario.getPerfil().name(),
-                usuario.getFotoPerfil()
+                usuario.getFotoPerfil(),
+                usuario.getCriadoEm()
         );
     }
 
@@ -237,7 +238,8 @@ public class UsuarioService {
                 amigo.getSequenciaAtual(),
                 amigo.getFotoPerfil(),
                 totalAmigos,
-                isAmigo
+                isAmigo,
+                amigo.getCriadoEm()
         );
     }
     public java.util.List<br.com.tupidigital.dto.UsuarioBuscaDTO> buscarUsuarios(String nome) {

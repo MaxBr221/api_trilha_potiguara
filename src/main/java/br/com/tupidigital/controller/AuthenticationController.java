@@ -80,7 +80,8 @@ public class AuthenticationController {
                 authUser.getXp(),
                 authUser.getSequenciaAtual(),
                 authUser.getPerfil().name(),
-                authUser.getFotoPerfil()
+                authUser.getFotoPerfil(),
+                authUser.getCriadoEm()
         );
 
         return ResponseEntity.ok(new TokenResponseDTO(token, sessaoDTO));
@@ -128,7 +129,8 @@ public class AuthenticationController {
                 newUsuario.getXp(),
                 newUsuario.getSequenciaAtual(),
                 newUsuario.getPerfil().name(),
-                newUsuario.getFotoPerfil()
+                newUsuario.getFotoPerfil(),
+                newUsuario.getCriadoEm()
         );
 
         return ResponseEntity.ok(new TokenResponseDTO(token, sessaoDTO));

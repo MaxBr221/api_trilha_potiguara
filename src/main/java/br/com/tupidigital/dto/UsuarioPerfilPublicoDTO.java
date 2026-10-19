@@ -1,7 +1,7 @@
 package br.com.tupidigital.dto;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
-import java.util.List;
 
 public record UsuarioPerfilPublicoDTO(
         UUID id,
@@ -10,5 +10,11 @@ public record UsuarioPerfilPublicoDTO(
         Integer sequenciaAtual,
         String fotoPerfil,
         int totalAmigos,
-        boolean isAmigo
-) {}
+        boolean isAmigo,
+        LocalDateTime criadoEm
+) {
+    public UsuarioPerfilPublicoDTO(UUID id, String nome, Integer xp, Integer sequenciaAtual, String fotoPerfil, int totalAmigos, boolean isAmigo) {
+        this(id, nome, xp, sequenciaAtual, fotoPerfil, totalAmigos, isAmigo, null);
+    }
+}
+

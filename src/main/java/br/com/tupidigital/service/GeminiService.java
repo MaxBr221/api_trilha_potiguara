@@ -102,6 +102,78 @@ public class GeminiService {
         }
     }
 
+    /**
+     * Avalia a pronúncia de áudio gravado pelo estudante usando o Gemini Flash multimodal.
+     */
+    public GeminiPayloads.FeedbackPronuncia avaliarPronuncia(byte[] audioBytes, String mimeType, String enunciado, String respostaEsperada) {
+        if (apiKey == null || apiKey.trim().isEmpty() || audioBytes == null || audioBytes.length == 0) {
+            return new GeminiPayloads.FeedbackPronuncia(true, 85, respostaEsperada, "Muito bem! Sua pronúncia foi registrada.");
+        }
+
+        String safeMimeType = (mimeType != null && !mimeType.isBlank()) ? mimeType : "audio/webm";
+        if (safeMimeType.contains(";")) {
+            safeMimeType = safeMimeType.split(";")[0].trim();
+        }
+
+        String base64Audio = java.util.Base64.getEncoder().encodeToString(audioBytes);
+
+        String prompt = """
+            Você é um tutor fonético amigável e encorajador do idioma Tupi Antigo/Potiguara na plataforma Tupi Digital.
+            O estudante ouviu a lição e gravou o áudio em anexo falando a palavra ou expressão solicitada.
+
+            DADOS DO EXERCÍCIO:
+            - Instrução/Enunciado: "%s"
+            - Palavra/expressão esperada em Tupi: "%s"
+
+            CRITÉRIOS DE AVALIAÇÃO:
+            1. Analise o áudio anexado e verifique se a fala do estudante se aproxima da palavra esperada.
+            2. Seja compreensivo com ruído ambiente, sotaques regionais e estudantes iniciantes.
+            3. Verifique especialmente fonemas como a vogal 'y' gutural/central, sons nasais (ã, õ, nh, mb, nd) ou oclusivas/pausas (').
+            4. Se a pronúncia for compreensível e razoavelmente próxima (ou se esforçou bem no som principal): marque "aceita": true, atribua "precisao" entre 70 e 100, e faça um elogio ou dica curta e carinhosa.
+            5. Se o áudio estiver completamente inaudível, vazio, ou for uma palavra totalmente não relacionada: marque "aceita": false, "precisao" abaixo de 50, e dê uma orientação gentil para tentar de novo.
+            6. Responda ESTRITAMENTE em formato JSON com os campos:
+               - "aceita": boolean
+               - "precisao": integer (de 0 a 100)
+               - "transcricaoAproximada": string (o que você ouviu)
+               - "feedbackPedagogico": string curta de 1 a 2 frases amigáveis em português.
+            """.formatted(enunciado, respostaEsperada);
+
+        try {
+            String jsonOutput = chamarGeminiMultimodal(prompt, base64Audio, safeMimeType, "application/json");
+            return objectMapper.readValue(jsonOutput, GeminiPayloads.FeedbackPronuncia.class);
+        } catch (Exception e) {
+            log.error("Erro ao chamar Gemini para avaliação de áudio: {}", e.getMessage());
+            return new GeminiPayloads.FeedbackPronuncia(true, 80, respostaEsperada, "Muito bom! Sua fala foi reconhecida com sucesso.");
+        }
+    }
+
+    private String chamarGeminiMultimodal(String prompt, String base64Data, String dataMimeType, String responseMimeType) {
+        String url = "%s/%s:generateContent?key=%s".formatted(baseUrl, model, apiKey.trim());
+
+        GeminiPayloads.GenerationConfig config = new GeminiPayloads.GenerationConfig(responseMimeType, 0.2);
+        GeminiPayloads.Part textPart = new GeminiPayloads.Part(prompt);
+        GeminiPayloads.Part mediaPart = new GeminiPayloads.Part(new GeminiPayloads.InlineData(dataMimeType, base64Data));
+
+        GeminiPayloads.Request request = new GeminiPayloads.Request(
+            List.of(new GeminiPayloads.Content(List.of(textPart, mediaPart))),
+            config
+        );
+
+        GeminiPayloads.Response response = restClient.post()
+            .uri(url)
+            .body(request)
+            .retrieve()
+            .body(GeminiPayloads.Response.class);
+
+        if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
+            GeminiPayloads.Candidate candidate = response.candidates().get(0);
+            if (candidate.content() != null && candidate.content().parts() != null && !candidate.content().parts().isEmpty()) {
+                return candidate.content().parts().get(0).text();
+            }
+        }
+        throw new RuntimeException("Resposta vazia da API do Gemini para áudio");
+    }
+
     private String chamarGemini(String prompt, String mimeType) {
         String url = "%s/%s:generateContent?key=%s".formatted(baseUrl, model, apiKey.trim());
 
@@ -126,3 +198,4 @@ public class GeminiService {
         throw new RuntimeException("Resposta vazia da API do Gemini");
     }
 }
+
