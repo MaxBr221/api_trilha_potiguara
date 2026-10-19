@@ -52,7 +52,7 @@ public class GeminiService {
             1. Analise se a resposta do aluno está correta ou se cometeu pequenos desvios de grafia (ex: trocou 'k' por 'c', esqueceu o apóstrofo/pausa glotal ', esqueceu circunflexo suave em î/û ou til nasal em ã/õ).
             2. Se for uma variação aceitável com apenas pequeno desvio ortográfico, marque aceita: true e dê uma orientação carinhosa de como escrever na grafia padrão.
             3. Se estiver completamente errada ou sem sentido, marque aceita: false e explique brevemente o que faltou, sem desestimular o aluno.
-            4. Responda ESTRITAMENTE em formato JSON com os campos "aceita" (boolean) e "feedbackPedagogico" (string curta de até 2 frases em português).
+            4. Responda ESTRITAMENTE em formato JSON com os campos "aceita" (boolean) e "feedbackPedagogico" (string curta de até 2 frases em português). Não utilize entidades HTML (como &#39; ou &quot;); use texto simples com aspas normais quando necessário.
             """.formatted(enunciado, respostaEsperada, respostaUsuario);
 
         try {
@@ -135,7 +135,7 @@ public class GeminiService {
                - "aceita": boolean
                - "precisao": integer (de 0 a 100)
                - "transcricaoAproximada": string (o que você ouviu)
-               - "feedbackPedagogico": string curta de 1 a 2 frases amigáveis em português.
+               - "feedbackPedagogico": string curta de 1 a 2 frases amigáveis em português. Não utilize entidades HTML (como &#39; ou &quot;); use texto simples com aspas normais quando necessário.
             """.formatted(enunciado, respostaEsperada);
 
         try {

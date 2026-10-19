@@ -69,6 +69,9 @@ public class ExercicioService {
             var avaliacaoIA = geminiService.avaliarTentativa(exercicio.getEnunciado(), respostaCorreta, respostaUsuario);
             correta = avaliacaoIA.aceita();
             feedback = avaliacaoIA.feedbackPedagogico();
+            if (feedback != null) {
+                feedback = HtmlUtils.htmlUnescape(feedback).trim();
+            }
         }
 
         Integer xpGanho = correta ? exercicio.getPontuacaoXp() : 0;
@@ -118,7 +121,13 @@ public class ExercicioService {
         boolean correta = avaliacaoIA.aceita() || (avaliacaoIA.precisao() != null && avaliacaoIA.precisao() >= 60);
         int precisao = avaliacaoIA.precisao() != null ? avaliacaoIA.precisao() : (correta ? 80 : 45);
         String feedback = avaliacaoIA.feedbackPedagogico();
+        if (feedback != null) {
+            feedback = HtmlUtils.htmlUnescape(feedback).trim();
+        }
         String transcricao = avaliacaoIA.transcricaoAproximada();
+        if (transcricao != null) {
+            transcricao = HtmlUtils.htmlUnescape(transcricao).trim();
+        }
 
         Integer xpGanho = correta ? exercicio.getPontuacaoXp() : 0;
 
