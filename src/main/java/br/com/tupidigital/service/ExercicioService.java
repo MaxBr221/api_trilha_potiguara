@@ -119,25 +119,33 @@ public class ExercicioService {
 
     @Transactional
     public Integer registrarProgressoUsuario(UUID exercicioId, boolean correta, Integer pontuacaoXp) {
+        if (!correta) {
+            return 0;
+        }
+
+        Integer xpPadrao = (pontuacaoXp != null) ? pontuacaoXp : 0;
+
         org.springframework.security.core.Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
+        // Se for visitante anônimo fazendo o teste inicial antes de criar conta,
+        // retorna a pontuação ganha para que o front-end acumule o XP (ex: 30 XP) e envie no cadastro
         if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
-            return 0;
+            return xpPadrao;
         }
 
         String email = auth.getName();
         org.springframework.security.core.userdetails.UserDetails userDetails = usuarioRepository.findByEmail(email);
         if (userDetails == null) {
-            return 0;
+            return xpPadrao;
         }
 
         Usuario usuario = (Usuario) userDetails;
         Exercicio exercicio = exercicioRepository.findById(exercicioId).orElse(null);
         if (exercicio == null) {
-            return 0;
+            return xpPadrao;
         }
 
-        Integer xpGanho = correta ? pontuacaoXp : 0;
+        Integer xpGanho = xpPadrao;
 
         if (correta) {
             boolean jaAcertou = progressoUsuarioExercicioRepository.existsByUsuarioIdAndExercicioIdAndAcertouTrue(usuario.getId(), exercicio.getId());
