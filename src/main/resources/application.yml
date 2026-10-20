@@ -18,19 +18,21 @@ spring:
     password: ${SPRING_DATASOURCE_PASSWORD}
     driver-class-name: org.postgresql.Driver
     hikari:
-      maximum-pool-size: 10
+      maximum-pool-size: 6
       minimum-idle: 2
-      idle-timeout: 300000
-      max-lifetime: 600000
-      connection-timeout: 20000
+      idle-timeout: 60000
+      max-lifetime: 180000
+      connection-timeout: 5000
+      keepalive-time: 30000
+      leak-detection-threshold: 3000
 
   jpa:
     hibernate:
       ddl-auto: validate # As requested, we use flyway, so we only validate JPA mapping
-    show-sql: true
+    show-sql: false
     properties:
       hibernate:
-        format_sql: true
+        format_sql: false
         dialect: org.hibernate.dialect.PostgreSQLDialect
 
   flyway:

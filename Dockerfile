@@ -22,5 +22,5 @@ COPY --from=build /app/target/*.jar app.jar
 # Expõe a porta que a aplicação vai rodar
 EXPOSE 8080
 
-# Comando para iniciar a aplicação com limite de memória otimizado para o Render
-ENTRYPOINT ["java", "-Xmx300m", "-Xms300m", "-XX:+UseG1GC", "-jar", "app.jar"]
+# Comando para iniciar a aplicação com limite de memória otimizado e seguro para os 512MB do Render
+ENTRYPOINT ["java", "-Xmx280m", "-Xms128m", "-XX:+UseSerialGC", "-XX:MaxMetaspaceSize=96m", "-XX:+ExitOnOutOfMemoryError", "-jar", "app.jar"]

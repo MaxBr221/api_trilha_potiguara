@@ -23,7 +23,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.annotation.Propagation;
 
 @Service
-@Transactional
 public class ExercicioService {
 
     @Autowired
@@ -40,7 +39,9 @@ public class ExercicioService {
 
     // Cache em memória: garante respostas em 0ms para a apresentação e blinda a cota do Gemini
     private final Map<UUID, String> cacheDicas = new ConcurrentHashMap<>();
+    private final Map<String, br.com.tupidigital.dto.GeminiPayloads.FeedbackAvaliacao> cacheAvaliacao = new ConcurrentHashMap<>();
 
+    @Transactional(readOnly = true)
     public List<ExercicioResponseDTO> listarExerciciosPorLicao(UUID licaoId) {
         return exercicioRepository.findByLicaoIdOrderByOrdemIndexAsc(licaoId).stream()
                 .map(ExercicioResponseDTO::new)
@@ -51,7 +52,7 @@ public class ExercicioService {
         Exercicio exercicio = exercicioRepository.findById(exercicioId)
                 .orElseThrow(() -> new RuntimeException("Exercício não encontrado"));
 
-        // Sanitização básica contra tentativas de injeção de HTML/Scripts simples (embora Spring e JPA já evitem SQLi e XSS se bem configurados)
+        // Sanitização básica contra tentativas de injeção de HTML/Scripts simples
         String respostaUsuario = request.respostaUsuario() != null ? request.respostaUsuario().replaceAll("<[^>]*>", "").trim() : "";
         respostaUsuario = HtmlUtils.htmlUnescape(respostaUsuario);
         String respostaCorreta = exercicio.getRespostaCorreta().trim();
@@ -65,48 +66,27 @@ public class ExercicioService {
         String feedback = correta ? "Parabéns! Resposta correta!" : null;
 
         // Se errou e for exercício de digitação/tradução/pronúncia, ativa avaliação pedagógica com IA (2.2)
+        // NOTA: Chamada ao Gemini é executada FORA de transação de banco para nunca travar conexões do HikariCP!
         if (!correta && ("DIGITACAO".equalsIgnoreCase(exercicio.getTipo()) || "TRADUCAO".equalsIgnoreCase(exercicio.getTipo()) || "PRONUNCIA".equalsIgnoreCase(exercicio.getTipo()))) {
-            var avaliacaoIA = geminiService.avaliarTentativa(exercicio.getEnunciado(), respostaCorreta, respostaUsuario);
-            correta = avaliacaoIA.aceita();
-            feedback = avaliacaoIA.feedbackPedagogico();
-            if (feedback != null) {
-                feedback = HtmlUtils.htmlUnescape(feedback).trim();
-            }
-        }
-
-        Integer xpGanho = correta ? exercicio.getPontuacaoXp() : 0;
-
-        org.springframework.security.core.Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-            String email = auth.getName();
-            org.springframework.security.core.userdetails.UserDetails userDetails = usuarioRepository.findByEmail(email);
-            
-            if (userDetails != null) {
-                Usuario usuario = (Usuario) userDetails;
-
-                if (correta) {
-                    // Verifica se o usuário já acertou esse exercício antes para evitar falha de segurança (XP infinito)
-                    boolean jaAcertou = progressoUsuarioExercicioRepository.existsByUsuarioIdAndExercicioIdAndAcertouTrue(usuario.getId(), exercicio.getId());
-                    
-                    if (!jaAcertou) {
-                        usuario.setXp(usuario.getXp() + xpGanho);
-                        usuarioRepository.save(usuario);
-                    } else {
-                        xpGanho = 0; // Se já acertou, não ganha XP novamente
-                    }
+            String cacheKey = exercicioId.toString() + ":" + rUserNorm.toLowerCase().trim();
+            var avaliacaoIA = cacheAvaliacao.get(cacheKey);
+            if (avaliacaoIA == null) {
+                avaliacaoIA = geminiService.avaliarTentativa(exercicio.getEnunciado(), respostaCorreta, respostaUsuario);
+                if (avaliacaoIA != null) {
+                    cacheAvaliacao.put(cacheKey, avaliacaoIA);
                 }
-
-                // Salva o histórico de progresso do exercício
-                br.com.tupidigital.entity.ProgressoUsuarioExercicio progressoExercicio = new br.com.tupidigital.entity.ProgressoUsuarioExercicio();
-                progressoExercicio.setUsuario(usuario);
-                progressoExercicio.setExercicio(exercicio);
-                progressoExercicio.setAcertou(correta);
-                progressoExercicio.setCriadoEm(java.time.LocalDateTime.now());
-                
-                progressoUsuarioExercicioRepository.save(progressoExercicio);
+            }
+            if (avaliacaoIA != null) {
+                correta = avaliacaoIA.aceita();
+                feedback = avaliacaoIA.feedbackPedagogico();
+                if (feedback != null) {
+                    feedback = HtmlUtils.htmlUnescape(feedback).trim();
+                }
             }
         }
+
+        // Salva progresso em transação curta e isolada (apenas ~2ms)
+        Integer xpGanho = registrarProgressoUsuario(exercicioId, correta, exercicio.getPontuacaoXp());
         
         return new ValidacaoRespostaResponseDTO(correta, xpGanho, exercicio.getRespostaCorreta(), feedback);
     }
@@ -116,6 +96,8 @@ public class ExercicioService {
                 .orElseThrow(() -> new RuntimeException("Exercício não encontrado"));
 
         String respostaCorreta = exercicio.getRespostaCorreta().trim();
+        
+        // Chamada de áudio ao Gemini executada FORA de transação para evitar pool starvation
         var avaliacaoIA = geminiService.avaliarPronuncia(audioBytes, mimeType, exercicio.getEnunciado(), respostaCorreta);
 
         boolean correta = avaliacaoIA.aceita() || (avaliacaoIA.precisao() != null && avaliacaoIA.precisao() >= 60);
@@ -129,38 +111,52 @@ public class ExercicioService {
             transcricao = HtmlUtils.htmlUnescape(transcricao).trim();
         }
 
-        Integer xpGanho = correta ? exercicio.getPontuacaoXp() : 0;
+        // Salva progresso em transação curta e isolada
+        Integer xpGanho = registrarProgressoUsuario(exercicioId, correta, exercicio.getPontuacaoXp());
 
+        return new ValidacaoAudioResponseDTO(correta, precisao, xpGanho, respostaCorreta, transcricao, feedback);
+    }
+
+    @Transactional
+    public Integer registrarProgressoUsuario(UUID exercicioId, boolean correta, Integer pontuacaoXp) {
         org.springframework.security.core.Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
-        if (auth != null && auth.isAuthenticated() && !auth.getPrincipal().equals("anonymousUser")) {
-            String email = auth.getName();
-            org.springframework.security.core.userdetails.UserDetails userDetails = usuarioRepository.findByEmail(email);
-            
-            if (userDetails != null) {
-                Usuario usuario = (Usuario) userDetails;
+        if (auth == null || !auth.isAuthenticated() || "anonymousUser".equals(auth.getPrincipal())) {
+            return 0;
+        }
 
-                if (correta) {
-                    boolean jaAcertou = progressoUsuarioExercicioRepository.existsByUsuarioIdAndExercicioIdAndAcertouTrue(usuario.getId(), exercicio.getId());
-                    if (!jaAcertou) {
-                        usuario.setXp(usuario.getXp() + xpGanho);
-                        usuarioRepository.save(usuario);
-                    } else {
-                        xpGanho = 0;
-                    }
-                }
+        String email = auth.getName();
+        org.springframework.security.core.userdetails.UserDetails userDetails = usuarioRepository.findByEmail(email);
+        if (userDetails == null) {
+            return 0;
+        }
 
-                br.com.tupidigital.entity.ProgressoUsuarioExercicio progressoExercicio = new br.com.tupidigital.entity.ProgressoUsuarioExercicio();
-                progressoExercicio.setUsuario(usuario);
-                progressoExercicio.setExercicio(exercicio);
-                progressoExercicio.setAcertou(correta);
-                progressoExercicio.setCriadoEm(java.time.LocalDateTime.now());
-                
-                progressoUsuarioExercicioRepository.save(progressoExercicio);
+        Usuario usuario = (Usuario) userDetails;
+        Exercicio exercicio = exercicioRepository.findById(exercicioId).orElse(null);
+        if (exercicio == null) {
+            return 0;
+        }
+
+        Integer xpGanho = correta ? pontuacaoXp : 0;
+
+        if (correta) {
+            boolean jaAcertou = progressoUsuarioExercicioRepository.existsByUsuarioIdAndExercicioIdAndAcertouTrue(usuario.getId(), exercicio.getId());
+            if (!jaAcertou) {
+                usuario.setXp(usuario.getXp() + xpGanho);
+                usuarioRepository.save(usuario);
+            } else {
+                xpGanho = 0;
             }
         }
 
-        return new ValidacaoAudioResponseDTO(correta, precisao, xpGanho, respostaCorreta, transcricao, feedback);
+        br.com.tupidigital.entity.ProgressoUsuarioExercicio progressoExercicio = new br.com.tupidigital.entity.ProgressoUsuarioExercicio();
+        progressoExercicio.setUsuario(usuario);
+        progressoExercicio.setExercicio(exercicio);
+        progressoExercicio.setAcertou(correta);
+        progressoExercicio.setCriadoEm(java.time.LocalDateTime.now());
+        progressoUsuarioExercicioRepository.save(progressoExercicio);
+
+        return xpGanho;
     }
 
     @Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)

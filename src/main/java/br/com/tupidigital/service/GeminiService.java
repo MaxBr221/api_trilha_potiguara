@@ -27,9 +27,20 @@ public class GeminiService {
     private final RestClient restClient;
     private final ObjectMapper objectMapper;
 
-    public GeminiService(ObjectMapper objectMapper) {
-        this.restClient = RestClient.builder().build();
-        this.objectMapper = objectMapper;
+    public GeminiService() {
+        this.objectMapper = new ObjectMapper();
+        
+        org.springframework.http.client.SimpleClientHttpRequestFactory requestFactory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
+        requestFactory.setConnectTimeout(java.time.Duration.ofSeconds(3));
+        requestFactory.setReadTimeout(java.time.Duration.ofSeconds(8));
+
+        this.restClient = RestClient.builder()
+                .requestFactory(requestFactory)
+                .messageConverters(converters -> {
+                    converters.removeIf(c -> c instanceof org.springframework.http.converter.json.MappingJackson2HttpMessageConverter);
+                    converters.add(new org.springframework.http.converter.json.MappingJackson2HttpMessageConverter(objectMapper));
+                })
+                .build();
     }
 
     /**
@@ -52,14 +63,14 @@ public class GeminiService {
             1. Analise se a resposta do aluno está correta ou se cometeu pequenos desvios de grafia (ex: trocou 'k' por 'c', esqueceu o apóstrofo/pausa glotal ', esqueceu circunflexo suave em î/û ou til nasal em ã/õ).
             2. Se for uma variação aceitável com apenas pequeno desvio ortográfico, marque aceita: true e dê uma orientação carinhosa de como escrever na grafia padrão.
             3. Se estiver completamente errada ou sem sentido, marque aceita: false e explique brevemente o que faltou, sem desestimular o aluno.
-            4. Responda ESTRITAMENTE em formato JSON com os campos "aceita" (boolean) e "feedbackPedagogico" (string curta de até 2 frases em português). Não utilize entidades HTML (como &#39; ou &quot;); use texto simples com aspas normais quando necessário.
+            4. Responda ESTRITAMENTE em formato JSON com os campos "aceita" (boolean) e "feedbackPedagogico" (string curta de até 2 frases em português). Não utilize entidades HTML; use texto simples com aspas normais quando necessário.
             """.formatted(enunciado, respostaEsperada, respostaUsuario);
 
         try {
             String jsonOutput = chamarGemini(prompt, "application/json");
             return objectMapper.readValue(jsonOutput, GeminiPayloads.FeedbackAvaliacao.class);
         } catch (Exception e) {
-            log.error("Erro ao chamar Gemini para avaliação: {}", e.getMessage());
+            log.warn("Aviso ao avaliar com Gemini (usando fallback seguro): {}", e.getMessage());
             return new GeminiPayloads.FeedbackAvaliacao(false, "Preste atenção na acentuação e na escrita da palavra em Tupi.");
         }
     }
@@ -171,7 +182,7 @@ public class GeminiService {
         if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
             GeminiPayloads.Candidate candidate = response.candidates().get(0);
             if (candidate.content() != null && candidate.content().parts() != null && !candidate.content().parts().isEmpty()) {
-                return candidate.content().parts().get(0).text();
+                return limparTextoJson(candidate.content().parts().get(0).text());
             }
         }
         throw new RuntimeException("Resposta vazia da API do Gemini para áudio");
@@ -195,10 +206,24 @@ public class GeminiService {
         if (response != null && response.candidates() != null && !response.candidates().isEmpty()) {
             GeminiPayloads.Candidate candidate = response.candidates().get(0);
             if (candidate.content() != null && candidate.content().parts() != null && !candidate.content().parts().isEmpty()) {
-                return candidate.content().parts().get(0).text();
+                return limparTextoJson(candidate.content().parts().get(0).text());
             }
         }
         throw new RuntimeException("Resposta vazia da API do Gemini");
+    }
+
+    private String limparTextoJson(String raw) {
+        if (raw == null) return "{}";
+        String unescaped = org.springframework.web.util.HtmlUtils.htmlUnescape(raw).trim();
+        if (unescaped.startsWith("```json")) {
+            unescaped = unescaped.substring(7);
+        } else if (unescaped.startsWith("```")) {
+            unescaped = unescaped.substring(3);
+        }
+        if (unescaped.endsWith("```")) {
+            unescaped = unescaped.substring(0, unescaped.length() - 3);
+        }
+        return unescaped.trim();
     }
 }
 
