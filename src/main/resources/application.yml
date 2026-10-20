@@ -1,6 +1,8 @@
 spring:
   application:
     name: tupi-digital-api
+  main:
+    allow-circular-references: true
 
   security:
     oauth2:
