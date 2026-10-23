@@ -11,6 +11,7 @@ import br.com.tupidigital.repository.ExercicioRepository;
 import br.com.tupidigital.repository.UsuarioRepository;
 import org.springframework.security.core.context.SecurityContextHolder;
 import br.com.tupidigital.repository.ProgressoUsuarioExercicioRepository;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.util.HtmlUtils;
@@ -41,6 +42,7 @@ public class ExercicioService {
     private final Map<UUID, String> cacheDicas = new ConcurrentHashMap<>();
     private final Map<String, br.com.tupidigital.dto.GeminiPayloads.FeedbackAvaliacao> cacheAvaliacao = new ConcurrentHashMap<>();
 
+    @Cacheable(value = "exercicios_licao", key = "#licaoId")
     @Transactional(readOnly = true)
     public List<ExercicioResponseDTO> listarExerciciosPorLicao(UUID licaoId) {
         return exercicioRepository.findByLicaoIdOrderByOrdemIndexAsc(licaoId).stream()

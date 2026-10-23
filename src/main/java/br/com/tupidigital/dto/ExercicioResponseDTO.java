@@ -18,7 +18,7 @@ public record ExercicioResponseDTO(
                 exercicio.getId(),
                 exercicio.getEnunciado(),
                 exercicio.getTipo(),
-                exercicio.getOpcoes(),
+                exercicio.getOpcoes() != null ? new java.util.ArrayList<>(exercicio.getOpcoes()) : java.util.List.of(),
                 exercicio.getPontuacaoXp(),
                 exercicio.getOrdemIndex()
         );

@@ -29,7 +29,6 @@ spring:
       leak-detection-threshold: 60000
 
   jpa:
-    open-in-view: false
     hibernate:
       ddl-auto: validate # As requested, we use flyway, so we only validate JPA mapping
     show-sql: false

@@ -42,7 +42,7 @@ public class Exercicio {
     @Column(name = "ordem_index", nullable = false)
     private Integer ordemIndex;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "exercicio_opcoes", joinColumns = @JoinColumn(name = "exercicio_id"))
     @Column(name = "opcao")
     private List<String> opcoes;
