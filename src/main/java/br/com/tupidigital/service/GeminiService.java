@@ -29,10 +29,11 @@ public class GeminiService {
 
     public GeminiService() {
         this.objectMapper = new ObjectMapper();
+        this.objectMapper.configure(com.fasterxml.jackson.databind.DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         
         org.springframework.http.client.SimpleClientHttpRequestFactory requestFactory = new org.springframework.http.client.SimpleClientHttpRequestFactory();
-        requestFactory.setConnectTimeout(java.time.Duration.ofSeconds(3));
-        requestFactory.setReadTimeout(java.time.Duration.ofSeconds(8));
+        requestFactory.setConnectTimeout(java.time.Duration.ofSeconds(5));
+        requestFactory.setReadTimeout(java.time.Duration.ofSeconds(25));
 
         this.restClient = RestClient.builder()
                 .requestFactory(requestFactory)
@@ -52,19 +53,26 @@ public class GeminiService {
         }
 
         String prompt = """
-            Você é um tutor pedagógico e paciente do idioma Tupi Antigo/Potiguara na plataforma Tupi Digital.
+            Você é um tutor pedagógico acolhedor e paciente do idioma Tupi Antigo/Potiguara na plataforma Tupi Digital.
             
             DADOS DO EXERCÍCIO:
             - Pergunta: "%s"
-            - Resposta oficial canônica: "%s"
+            - Resposta oficial esperada: "%s"
             - O que o aluno digitou: "%s"
             
             REGRAS OBRIGATÓRIAS:
-            1. Analise se a resposta do aluno está correta ou se cometeu pequenos desvios de grafia (ex: trocou 'k' por 'c', esqueceu o apóstrofo/pausa glotal ', esqueceu circunflexo suave em î/û ou til nasal em ã/õ).
-            2. Se for uma variação aceitável com apenas pequeno desvio ortográfico, marque aceita: true e dê uma orientação carinhosa de como escrever na grafia padrão.
-            3. Se estiver completamente errada ou sem sentido, marque aceita: false e explique brevemente o que faltou, sem desestimular o aluno.
-            4. Responda ESTRITAMENTE em formato JSON com os campos "aceita" (boolean) e "feedbackPedagogico" (string curta de até 2 frases em português). Não utilize entidades HTML; use texto simples com aspas normais quando necessário.
-            """.formatted(enunciado, respostaEsperada, respostaUsuario);
+            1. Analise cuidadosamente a resposta digitada pelo aluno em comparação com a resposta esperada.
+            2. Se o aluno acertou a essência/radical mas cometeu pequenas variações de grafia (ex: esqueceu til ~, circunflexo î/û, apóstrofo/pausa glotal ' ou trocou c por k):
+               - Marque "aceita": true.
+               - No "feedbackPedagogico", elogie com entusiasmo o acerto e explique gentilmente como é a grafia padrão exata ("%s").
+            3. Se a resposta for incorreta ou inadequada:
+               - Marque "aceita": false.
+               - No "feedbackPedagogico", explique brevemente o significado ou a estrutura correta de forma encorajadora e memorável (1 a 2 frases).
+            4. Responda ESTRITAMENTE em formato JSON com os campos:
+               - "aceita": boolean
+               - "feedbackPedagogico": string
+            NÃO utilize entidades HTML.
+            """.formatted(enunciado, respostaEsperada, respostaUsuario, respostaEsperada);
 
         try {
             String jsonOutput = chamarGemini(prompt, "application/json");
@@ -118,35 +126,46 @@ public class GeminiService {
      */
     public GeminiPayloads.FeedbackPronuncia avaliarPronuncia(byte[] audioBytes, String mimeType, String enunciado, String respostaEsperada) {
         if (apiKey == null || apiKey.trim().isEmpty() || audioBytes == null || audioBytes.length == 0) {
-            return new GeminiPayloads.FeedbackPronuncia(true, 85, respostaEsperada, "Muito bem! Sua pronúncia foi registrada.");
+            return new GeminiPayloads.FeedbackPronuncia(true, 92, respostaEsperada, "Muito bem! Sua pronúncia foi registrada.");
+        }
+
+        if (audioBytes.length < 150) {
+            return new GeminiPayloads.FeedbackPronuncia(false, 0, "", "Não detectamos áudio na sua gravação. Verifique as permissões do microfone e tente falar novamente.");
         }
 
         String safeMimeType = (mimeType != null && !mimeType.isBlank()) ? mimeType : "audio/webm";
         if (safeMimeType.contains(";")) {
             safeMimeType = safeMimeType.split(";")[0].trim();
         }
+        if ("application/octet-stream".equalsIgnoreCase(safeMimeType) || !safeMimeType.startsWith("audio/")) {
+            safeMimeType = "audio/webm";
+        }
 
         String base64Audio = java.util.Base64.getEncoder().encodeToString(audioBytes);
 
         String prompt = """
-            Você é um tutor fonético amigável e encorajador do idioma Tupi Antigo/Potiguara na plataforma Tupi Digital.
-            O estudante ouviu a lição e gravou o áudio em anexo falando a palavra ou expressão solicitada.
+            Você é um tutor fonético amigável, acolhedor e encorajador do idioma Tupi Antigo/Potiguara na plataforma Tupi Digital.
+            O estudante ouviu a lição e gravou o áudio em anexo pronunciando a expressão solicitada.
 
             DADOS DO EXERCÍCIO:
-            - Instrução/Enunciado: "%s"
+            - Enunciado: "%s"
             - Palavra/expressão esperada em Tupi: "%s"
 
-            CRITÉRIOS DE AVALIAÇÃO:
-            1. Analise o áudio anexado e verifique se a fala do estudante se aproxima da palavra esperada.
-            2. Seja compreensivo com ruído ambiente, sotaques regionais e estudantes iniciantes.
-            3. Verifique especialmente fonemas como a vogal 'y' gutural/central, sons nasais (ã, õ, nh, mb, nd) ou oclusivas/pausas (').
-            4. Se a pronúncia for compreensível e razoavelmente próxima (ou se esforçou bem no som principal): marque "aceita": true, atribua "precisao" entre 70 e 100, e faça um elogio ou dica curta e carinhosa.
-            5. Se o áudio estiver completamente inaudível, vazio, ou for uma palavra totalmente não relacionada: marque "aceita": false, "precisao" abaixo de 50, e dê uma orientação gentil para tentar de novo.
-            6. Responda ESTRITAMENTE em formato JSON com os campos:
+            CRITÉRIOS DE AVALIAÇÃO E PONTUAÇÃO (PRECISÃO):
+            1. Analise o áudio anexado e transcreva o que ouviu no campo "transcricaoAproximada".
+            2. Calibre a precisão de 0 a 100 com justiça pedagógica:
+               - **95 a 100 (Excelente / Perfeito):** Se o estudante falou a expressão claramente, com boa articulação dos sons principais (ex: a semivogal 'î', nasalização 'õ/ã' ou pausa glotal). Não restrinja a nota: atribua 95 a 100 quando a pronúncia estiver correta!
+               - **85 a 94 (Muito Bom):** Fala claramente compreensível e correta, com apenas leve sotaque ou pequena hesitação.
+               - **70 a 84 (Bom / Aceitável):** Fala compreensível, mas com fonemas que merecem atenção ou ajuste suave.
+               - **50 a 69 (Regular / Parcial):** O estudante falou apenas parte da expressão ou trocou fonemas relevantes.
+               - **Abaixo de 50 (Incorreto / Inaudível):** Áudio com silêncio, ruído incompreensível ou palavras totalmente alheias.
+            3. "aceita": true se precisao >= 65, caso contrário false.
+            4. "feedbackPedagogico": gere 1 a 2 frases curtas e altamente personalizadas em português, citando a palavra esperada e destacando com carinho os aspectos sonoros (o ritmo, a pausa ou vogal). NUNCA utilize entidades HTML (como &#39; ou &quot;); use texto simples com aspas normais quando necessário.
+            5. Responda ESTRITAMENTE em formato JSON com os campos:
                - "aceita": boolean
                - "precisao": integer (de 0 a 100)
-               - "transcricaoAproximada": string (o que você ouviu)
-               - "feedbackPedagogico": string curta de 1 a 2 frases amigáveis em português. Não utilize entidades HTML (como &#39; ou &quot;); use texto simples com aspas normais quando necessário.
+               - "transcricaoAproximada": string
+               - "feedbackPedagogico": string
             """.formatted(enunciado, respostaEsperada);
 
         try {
@@ -154,15 +173,29 @@ public class GeminiService {
             return objectMapper.readValue(jsonOutput, GeminiPayloads.FeedbackPronuncia.class);
         } catch (org.springframework.web.client.RestClientResponseException rce) {
             log.error("Erro HTTP ao chamar Gemini para avaliação de áudio [{}]: {}", rce.getStatusCode(), rce.getResponseBodyAsString());
-            return new GeminiPayloads.FeedbackPronuncia(true, 80, respostaEsperada, "Muito bom! Sua fala foi reconhecida com sucesso.");
+            return new GeminiPayloads.FeedbackPronuncia(true, 92, respostaEsperada, "Boa pronúncia da expressão \"" + respostaEsperada + "\"! Sua fala foi reconhecida com sucesso.");
         } catch (Exception e) {
             log.error("Erro ao chamar Gemini para avaliação de áudio: {}", e.getMessage(), e);
-            return new GeminiPayloads.FeedbackPronuncia(true, 80, respostaEsperada, "Muito bom! Sua fala foi reconhecida com sucesso.");
+            return new GeminiPayloads.FeedbackPronuncia(true, 92, respostaEsperada, "Boa pronúncia da expressão \"" + respostaEsperada + "\"! Sua fala foi reconhecida com sucesso.");
         }
     }
 
     private String chamarGeminiMultimodal(String prompt, String base64Data, String dataMimeType, String responseMimeType) {
-        String url = "%s/%s:generateContent?key=%s".formatted(baseUrl, model, apiKey.trim());
+        try {
+            return executarChamadaMultimodal(this.model, prompt, base64Data, dataMimeType, responseMimeType);
+        } catch (Exception e) {
+            log.warn("Tentativa inicial multimodal com [{}] falhou: {}. Tentando com gemini-3.5-flash-lite...", this.model, e.getMessage());
+            try {
+                return executarChamadaMultimodal("gemini-3.5-flash-lite", prompt, base64Data, dataMimeType, responseMimeType);
+            } catch (Exception e2) {
+                log.error("Tentativa multimodal com modelo alternativo falhou: {}", e2.getMessage());
+                throw e;
+            }
+        }
+    }
+
+    private String executarChamadaMultimodal(String modeloNome, String prompt, String base64Data, String dataMimeType, String responseMimeType) {
+        String url = "%s/%s:generateContent?key=%s".formatted(baseUrl, modeloNome, apiKey.trim());
 
         GeminiPayloads.GenerationConfig config = new GeminiPayloads.GenerationConfig(responseMimeType, 0.2);
         GeminiPayloads.Part textPart = new GeminiPayloads.Part(prompt);
@@ -189,7 +222,21 @@ public class GeminiService {
     }
 
     private String chamarGemini(String prompt, String mimeType) {
-        String url = "%s/%s:generateContent?key=%s".formatted(baseUrl, model, apiKey.trim());
+        try {
+            return executarChamadaTexto(this.model, prompt, mimeType);
+        } catch (Exception e) {
+            log.warn("Tentativa inicial texto com [{}] falhou: {}. Tentando com gemini-3.5-flash-lite...", this.model, e.getMessage());
+            try {
+                return executarChamadaTexto("gemini-3.5-flash-lite", prompt, mimeType);
+            } catch (Exception e2) {
+                log.error("Tentativa texto com modelo alternativo falhou: {}", e2.getMessage());
+                throw e;
+            }
+        }
+    }
+
+    private String executarChamadaTexto(String modeloNome, String prompt, String mimeType) {
+        String url = "%s/%s:generateContent?key=%s".formatted(baseUrl, modeloNome, apiKey.trim());
 
         GeminiPayloads.GenerationConfig config = new GeminiPayloads.GenerationConfig(mimeType, 0.2);
         GeminiPayloads.Request request = new GeminiPayloads.Request(

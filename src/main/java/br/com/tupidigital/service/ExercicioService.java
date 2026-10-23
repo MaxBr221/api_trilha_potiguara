@@ -57,18 +57,28 @@ public class ExercicioService {
         respostaUsuario = HtmlUtils.htmlUnescape(respostaUsuario);
         String respostaCorreta = exercicio.getRespostaCorreta().trim();
 
-        // Normalizar strings para evitar falhas por aspas simples HTML (&#39;) ou aspas tipográficas
-        String rUserNorm = respostaUsuario.replace("'", "").replace("’", "").replace("&#39;", "").replace("&apos;", "");
-        String rCorrNorm = respostaCorreta.replace("'", "").replace("’", "").replace("&#39;", "").replace("&apos;", "");
-        
-        // Comparação simples (ignorando case)
-        boolean correta = rUserNorm.equalsIgnoreCase(rCorrNorm) || respostaUsuario.equalsIgnoreCase(respostaCorreta);
-        String feedback = correta ? "Parabéns! Resposta correta!" : null;
+        String rUserClean = removerAcentosEPontuacao(respostaUsuario);
+        String rCorrClean = removerAcentosEPontuacao(respostaCorreta);
 
-        // Se errou e for exercício de digitação/tradução/pronúncia, ativa avaliação pedagógica com IA (2.2)
-        // NOTA: Chamada ao Gemini é executada FORA de transação de banco para nunca travar conexões do HikariCP!
-        if (!correta && ("DIGITACAO".equalsIgnoreCase(exercicio.getTipo()) || "TRADUCAO".equalsIgnoreCase(exercicio.getTipo()) || "PRONUNCIA".equalsIgnoreCase(exercicio.getTipo()))) {
-            String cacheKey = exercicioId.toString() + ":" + rUserNorm.toLowerCase().trim();
+        boolean correta = false;
+        String feedback = null;
+
+        if (respostaUsuario.equalsIgnoreCase(respostaCorreta)) {
+            // 1. Exato perfeito
+            correta = true;
+            feedback = "Excelente! Você acertou em cheio a resposta: \"" + respostaCorreta + "\".";
+        } else if (rUserClean.equalsIgnoreCase(rCorrClean)) {
+            // 2. Tolerância a Acentos e Caracteres Especiais (Estilo Duolingo)
+            correta = true;
+            feedback = "Correto! Mas fique atento aos acentos e caracteres especiais: a grafia padrão é \"" + respostaCorreta + "\".";
+        } else if (rUserClean.length() >= 3 && calcularDistanciaLevenshtein(rUserClean, rCorrClean) == 1) {
+            // 3. Tolerância a Erro de Digitação / Typo de 1 letra (Estilo Duolingo)
+            correta = true;
+            feedback = "Você teve um pequeno deslize de digitação! Você escreveu \"" + respostaUsuario + "\", mas a grafia padrão é \"" + respostaCorreta + "\". Fique atento!";
+        } else if ("DIGITACAO".equalsIgnoreCase(exercicio.getTipo()) || "TRADUCAO".equalsIgnoreCase(exercicio.getTipo()) || "PRONUNCIA".equalsIgnoreCase(exercicio.getTipo())) {
+            // 4. Casos mais complexos avaliados pedagogicamente pelo Gemini (2.2)
+            // NOTA: Chamada ao Gemini é executada FORA de transação de banco para nunca travar conexões do HikariCP!
+            String cacheKey = exercicioId.toString() + ":" + rUserClean;
             var avaliacaoIA = cacheAvaliacao.get(cacheKey);
             if (avaliacaoIA == null) {
                 avaliacaoIA = geminiService.avaliarTentativa(exercicio.getEnunciado(), respostaCorreta, respostaUsuario);
@@ -83,6 +93,8 @@ public class ExercicioService {
                     feedback = HtmlUtils.htmlUnescape(feedback).trim();
                 }
             }
+        } else {
+            feedback = "Não foi dessa vez. A resposta correta é: \"" + respostaCorreta + "\". Continue praticando!";
         }
 
         // Salva progresso em transação curta e isolada (apenas ~2ms)
@@ -96,12 +108,23 @@ public class ExercicioService {
                 .orElseThrow(() -> new RuntimeException("Exercício não encontrado"));
 
         String respostaCorreta = exercicio.getRespostaCorreta().trim();
+
+        if (audioBytes == null || audioBytes.length < 150) {
+            return new ValidacaoAudioResponseDTO(
+                    false,
+                    0,
+                    0,
+                    respostaCorreta,
+                    "",
+                    "O microfone não capturou a sua fala. Por favor, verifique as permissões do microfone e tente gravar novamente."
+            );
+        }
         
         // Chamada de áudio ao Gemini executada FORA de transação para evitar pool starvation
         var avaliacaoIA = geminiService.avaliarPronuncia(audioBytes, mimeType, exercicio.getEnunciado(), respostaCorreta);
 
-        boolean correta = avaliacaoIA.aceita() || (avaliacaoIA.precisao() != null && avaliacaoIA.precisao() >= 60);
-        int precisao = avaliacaoIA.precisao() != null ? avaliacaoIA.precisao() : (correta ? 80 : 45);
+        boolean correta = avaliacaoIA.aceita() || (avaliacaoIA.precisao() != null && avaliacaoIA.precisao() >= 65);
+        int precisao = avaliacaoIA.precisao() != null ? avaliacaoIA.precisao() : (correta ? 92 : 35);
         String feedback = avaliacaoIA.feedbackPedagogico();
         if (feedback != null) {
             feedback = HtmlUtils.htmlUnescape(feedback).trim();
@@ -192,5 +215,39 @@ public class ExercicioService {
         }
 
         return new DicaExercicioResponseDTO(dica);
+    }
+
+    private String removerAcentosEPontuacao(String str) {
+        if (str == null) return "";
+        String normalized = java.text.Normalizer.normalize(str, java.text.Normalizer.Form.NFD);
+        return normalized.replaceAll("\\p{M}", "")
+                         .replace("'", "")
+                         .replace("’", "")
+                         .replace("&#39;", "")
+                         .replace("&apos;", "")
+                         .replaceAll("\\s+", " ")
+                         .trim()
+                         .toLowerCase();
+    }
+
+    private int calcularDistanciaLevenshtein(String s1, String s2) {
+        int[] costs = new int[s2.length() + 1];
+        for (int i = 0; i <= s1.length(); i++) {
+            int lastValue = i;
+            for (int j = 0; j <= s2.length(); j++) {
+                if (i == 0) {
+                    costs[j] = j;
+                } else if (j > 0) {
+                    int newValue = costs[j - 1];
+                    if (s1.charAt(i - 1) != s2.charAt(j - 1)) {
+                        newValue = Math.min(Math.min(newValue, lastValue), costs[j]) + 1;
+                    }
+                    costs[j - 1] = lastValue;
+                    lastValue = newValue;
+                }
+            }
+            if (i > 0) costs[s2.length()] = lastValue;
+        }
+        return costs[s2.length()];
     }
 }

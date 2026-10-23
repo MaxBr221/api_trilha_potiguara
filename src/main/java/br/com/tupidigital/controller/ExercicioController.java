@@ -56,11 +56,16 @@ public class ExercicioController {
             @RequestBody @Valid ValidacaoAudioRequestDTO request) {
         try {
             String base64Clean = request.audioBase64();
+            String mimeType = request.mimeType();
             if (base64Clean != null && base64Clean.contains(",")) {
-                base64Clean = base64Clean.split(",")[1];
+                String[] parts = base64Clean.split(",");
+                if ((mimeType == null || mimeType.isBlank()) && parts[0].contains(":") && parts[0].contains(";")) {
+                    mimeType = parts[0].substring(parts[0].indexOf(":") + 1, parts[0].indexOf(";"));
+                }
+                base64Clean = parts[1];
             }
-            byte[] bytes = Base64.getDecoder().decode(base64Clean);
-            return ResponseEntity.ok(exercicioService.validarAudio(id, bytes, request.mimeType()));
+            byte[] bytes = (base64Clean != null && !base64Clean.isBlank()) ? Base64.getDecoder().decode(base64Clean) : new byte[0];
+            return ResponseEntity.ok(exercicioService.validarAudio(id, bytes, mimeType));
         } catch (Exception e) {
             throw new RuntimeException("Falha ao decodificar áudio Base64: " + e.getMessage());
         }
