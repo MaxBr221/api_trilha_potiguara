@@ -46,6 +46,11 @@ public class ArenaController {
         return ResponseEntity.ok(arenaService.avancarEtapa(pin));
     }
 
+    @PostMapping("/{pin}/pular-para-proxima")
+    public ResponseEntity<EstadoArenaResponseDTO> pularParaProxima(@PathVariable String pin) {
+        return ResponseEntity.ok(arenaService.pularParaProximaQuestao(pin));
+    }
+
     @PostMapping("/{pin}/responder")
     public ResponseEntity<ResponderArenaResponseDTO> responder(
             @PathVariable String pin,

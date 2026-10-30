@@ -2,3 +2,4 @@
 UPDATE exercicio_opcoes 
 SET opcao = 'homem' 
 WHERE opcao LIKE '%sempre memé%';
+

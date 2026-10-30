@@ -244,6 +244,28 @@ public class ArenaService {
         return obterEstado(pinLimpo, null);
     }
 
+    public EstadoArenaResponseDTO pularParaProximaQuestao(String pin) {
+        String pinLimpo = pin.replaceAll("\\s+", "").trim();
+        SalaArena sala = salaArenaRepository.findByCodigoPin(pinLimpo)
+                .orElseThrow(() -> new IllegalArgumentException("Sala não encontrada com o PIN: " + pinLimpo));
+
+        int totalQuestoes = (sala.getQuestoes() != null) ? sala.getQuestoes().size() : 0;
+
+        if (sala.getStatus() == StatusArena.REVELACAO || sala.getStatus() == StatusArena.PLACAR) {
+            if (sala.getPerguntaAtualIndex() < totalQuestoes) {
+                sala.setPerguntaAtualIndex(sala.getPerguntaAtualIndex() + 1);
+                sala.setStatus(StatusArena.PERGUNTA_ATIVA);
+                sala.setTempoInicioPergunta(LocalDateTime.now());
+            } else {
+                sala.setStatus(StatusArena.FINALIZADA);
+                creditarXpFinalistas(sala);
+            }
+            salaArenaRepository.save(sala);
+        }
+
+        return obterEstado(pinLimpo, null);
+    }
+
     public ResponderArenaResponseDTO responder(String pin, ResponderArenaRequestDTO dto) {
         String pinLimpo = pin.replaceAll("\\s+", "").trim();
         SalaArena sala = salaArenaRepository.findByCodigoPin(pinLimpo)
