@@ -275,6 +275,14 @@ public class ArenaService {
             throw new IllegalStateException("Esta questão não está aberta para respostas no momento.");
         }
 
+        // Validação de tempo limite: impede resposta se o cronômetro oficial já expirou (+ tolerância de 2s para latência)
+        if (sala.getTempoInicioPergunta() != null && sala.getTempoPerguntaSegundos() != null) {
+            long segundosDecorridos = Duration.between(sala.getTempoInicioPergunta(), LocalDateTime.now()).getSeconds();
+            if (segundosDecorridos > sala.getTempoPerguntaSegundos() + 2) {
+                throw new IllegalStateException("O tempo para responder esta questão já se esgotou.");
+            }
+        }
+
         ParticipanteArena participante = participanteArenaRepository.findById(dto.participanteId())
                 .orElseThrow(() -> new IllegalArgumentException("Participante não encontrado"));
 
