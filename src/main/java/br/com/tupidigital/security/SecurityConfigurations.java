@@ -54,6 +54,8 @@ public class SecurityConfigurations {
                         .requestMatchers(HttpMethod.GET, "/api/v1/dicionario/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/v1/exercicios/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/v1/exercicios/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/v1/arena/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/v1/arena/**").permitAll()
                         .requestMatchers("/api/v1/admin/**").hasRole("ADMIN")
                         .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
