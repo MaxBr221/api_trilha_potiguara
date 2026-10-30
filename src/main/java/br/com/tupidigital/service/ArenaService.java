@@ -382,10 +382,20 @@ public class ArenaService {
                         .filter(r -> r.getOpcaoEscolhida() != null)
                         .collect(Collectors.groupingBy(RespostaArena::getOpcaoEscolhida, Collectors.counting()));
 
-                // Procura conteúdo linguístico associado para enriquecer com fonética
+                // Procura conteúdo linguístico associado para enriquecer com fonética e tradução
                 if (exercicioAtual.getLicao() != null && exercicioAtual.getLicao().getConteudos() != null) {
+                    String respLower = respostaCorreta != null ? respostaCorreta.toLowerCase().trim() : "";
+                    String enunLower = enunciado != null ? enunciado.toLowerCase().trim() : "";
+
                     for (ConteudoLinguistico c : exercicioAtual.getLicao().getConteudos()) {
-                        if (c.getPalavraTupi() != null && respostaCorreta.toLowerCase().contains(c.getPalavraTupi().toLowerCase())) {
+                        String palTupi = c.getPalavraTupi() != null ? c.getPalavraTupi().toLowerCase().trim() : "";
+                        String tradPt = c.getTraducaoPtBr() != null ? c.getTraducaoPtBr().toLowerCase().trim() : "";
+
+                        // Verifica correspondência direta de Tupi ou Português no enunciado ou na resposta
+                        boolean matchTupi = !palTupi.isEmpty() && (respLower.equals(palTupi) || enunLower.contains("\"" + palTupi + "\"") || enunLower.contains(palTupi));
+                        boolean matchPt = !tradPt.isEmpty() && (respLower.equals(tradPt) || enunLower.contains("\"" + tradPt + "\"") || respLower.contains(tradPt));
+
+                        if (matchTupi || matchPt) {
                             fonetica = c.getFonetica();
                             traducaoPtBr = c.getTraducaoPtBr();
                             break;
